@@ -33,7 +33,7 @@ const SignUpForm = (props) => {
 
         e.preventDefault();
 
-        const url = "https://calendara-65xh.onrender.com/api/users";
+        const url = "https://calendarabackend.onrender.com/api/users";
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValidEmail = emailRegex.test(data.email);

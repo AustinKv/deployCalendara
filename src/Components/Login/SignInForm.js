@@ -58,11 +58,11 @@ const SignInForm = (props) => {
 
         e.preventDefault();
 
-        const url = "https://calendara-65xh.onrender.com/api/auth";
+        const url = "https://calendarabackend.onrender.com/api/auth";
 
         try {
             const { data: res } = await axios.post(url, data);
-            const nameURL = `https://calendara-65xh.onrender.com/api/getData/${data.email}`;
+            const nameURL = `https://calendarabackend.onrender.com/api/getData/${data.email}`;
             const response = await axios.get(nameURL);
 
             setUserName(response.data.name);
