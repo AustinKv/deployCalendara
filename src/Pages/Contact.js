@@ -20,7 +20,7 @@ const Contact = (props) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const url = "https://calendarabackend.onrender.com/api/contactus";
+        const url = "https://calendara-65xh.onrender.com/api/contactus";
 
         try {
             await axios.post(url, data);

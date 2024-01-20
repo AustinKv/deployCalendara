@@ -33,7 +33,7 @@ const SignUpForm = (props) => {
 
         e.preventDefault();
 
-        const url = "https://calendarabackend.onrender.com/api/users";
+        const url = "https://calendara-65xh.onrender.com/api/users";
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValidEmail = emailRegex.test(data.email);
@@ -62,7 +62,10 @@ const SignUpForm = (props) => {
 
             console.log(res.message);
         } catch (error) {
-            if (error.response && error.response.status === 409) {
+            
+            if (error.response && error.response.status === 408) {
+                alert("Contact already exists!");
+            } else if (error.response && error.response.status === 409) {
                 alert("Email already exists!");
             } else if (error.response && error.response.status === 400) {
                 alert(
