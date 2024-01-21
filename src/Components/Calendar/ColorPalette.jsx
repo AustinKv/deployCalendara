@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TwitterPicker } from "react-color";
+import { CirclePicker } from "react-color";
 
 const ColorPalette = ({ onSelectColor, initialColor }) => {
     const [color, setColor] = useState(initialColor || "#3174ad"); // Default color
@@ -17,16 +17,13 @@ const ColorPalette = ({ onSelectColor, initialColor }) => {
     return (
         <div>
             <div>
-                <TwitterPicker color={color} onChange={handleChange} />
+                <CirclePicker color={color} onChange={handleChange} />
             </div>
-            <div
-                style={{ width: "51%" }}
-                className="d-flex justify-content-center"
-            >
+            <div className="d-flex justify-content-start">
                 <button
                     className="btn mt-3"
                     onClick={handleSelect}
-                    style={{ backgroundColor: color }}
+                    style={{ backgroundColor: color, marginLeft: "4rem" }}
                 >
                     Select Color
                 </button>

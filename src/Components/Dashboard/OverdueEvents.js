@@ -1,7 +1,7 @@
 import React from "react";
 import { PieChart, Pie, Tooltip, Cell } from "recharts";
 
-const UpcomingEvents = (props) => {
+const OverdueEvents = (props) => {
     const data = [
         { name: "Completed Events", value: 2400 },
         { name: "Total Events", value: 4567 },
@@ -9,7 +9,9 @@ const UpcomingEvents = (props) => {
 
     const totalEventsColor = props.mode === "light" ? "#e6e6e6" : "#474b52";
 
-    const COLORS = ["#daa520", totalEventsColor];
+    const COLORS = ["#ff0000", totalEventsColor];
+
+    // the data for the events
 
     return (
         <>
@@ -19,14 +21,14 @@ const UpcomingEvents = (props) => {
                         <div
                             className="d-flex align-items-center justify-content-center"
                             style={{
-                                backgroundColor: "#ffc107",
-                                color: "black",
+                                backgroundColor: "#dc3545",
+                                color: "white",
                                 height: "4rem",
                                 width: "4rem",
                                 borderRadius: "2rem",
                             }}
                         >
-                            <i className="bi bi-clock"></i>
+                            <i className="bi bi-calendar-x"></i>
                         </div>
                     </div>
                     <div className="col-12 d-flex justify-content-center mt-3">
@@ -35,7 +37,7 @@ const UpcomingEvents = (props) => {
                                 props.mode === "light" ? "black" : "white"
                             }`}
                         >
-                            Not Completed Events - Upcoming
+                            Not Completed Events - Overdue
                         </p>
                     </div>
                     <div className="col-12 p-0">
@@ -65,7 +67,7 @@ const UpcomingEvents = (props) => {
                                 style={{
                                     height: "1.5rem",
                                     width: "1.5rem",
-                                    backgroundColor: "#daa520",
+                                    backgroundColor: "#ff0000",
                                 }}
                             ></div>
                             <div className="ms-2">
@@ -116,4 +118,4 @@ const UpcomingEvents = (props) => {
     );
 };
 
-export default UpcomingEvents;
+export default OverdueEvents;
