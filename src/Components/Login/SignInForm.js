@@ -1,11 +1,10 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import axios from "axios";
 
 const SignInForm = (props) => {
-    const navigate = useNavigate();
 
     const [viewPassword, setViewPassword] = useState(true);
 
@@ -39,7 +38,7 @@ const SignInForm = (props) => {
 
         const fetchData = async () => {
             try {
-                const nameURL = `http://localhost:55555/api/getData/${data.email}`;
+                const nameURL = `https://calendarabackend.onrender.com/api/getData/${data.email}`;
                 const response = await axios.get(nameURL);
                 setUserName(response.data.name);
                 setContact(response.data.contact);
@@ -78,7 +77,7 @@ const SignInForm = (props) => {
             localStorage.setItem("token", res.data);
 
             window.alert(`Welcome ${response.data.name || data.email}!`);
-            navigate("/");
+            window.location.reload();
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 alert("Invalid Email!");
