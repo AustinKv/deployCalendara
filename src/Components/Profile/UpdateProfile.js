@@ -35,7 +35,7 @@ const UpdateProfile = (props) => {
         }
 
         try {
-            const url = "http://localhost:55555/api/profilepic";
+            const url = "https://calendarabackend.onrender.com/api/profilepic";
 
             // Send a POST request to the server with FormData
             const response = await axios.post(url, profileData);
@@ -84,7 +84,7 @@ const UpdateProfile = (props) => {
         }
 
         try {
-            const url = "http://localhost:55555/api/profilepic";
+            const url = "https://calendarabackend.onrender.com/api/profilepic";
 
             // Send a POST request to the server with FormData
             const response = await axios.post(url, backgroundData);

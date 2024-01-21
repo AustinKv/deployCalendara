@@ -38,7 +38,7 @@ const SignInForm = (props) => {
 
         const fetchData = async () => {
             try {
-                const nameURL = `http://localhost:55555/api/getData/${data.email}`;
+                const nameURL = `https://calendarabackend.onrender.com/api/getData/${data.email}`;
                 const response = await axios.get(nameURL);
                 setUserName(response.data.name);
                 setContact(response.data.contact);
@@ -57,11 +57,11 @@ const SignInForm = (props) => {
 
         e.preventDefault();
 
-        const url = "http://localhost:55555/api/auth";
+        const url = "https://calendarabackend.onrender.com/api/auth";
 
         try {
             const { data: res } = await axios.post(url, data);
-            const nameURL = `http://localhost:55555/api/getData/${data.email}`;
+            const nameURL = `https://calendarabackend.onrender.com/api/getData/${data.email}`;
             const response = await axios.get(nameURL);
 
             setUserName(response.data.name);
