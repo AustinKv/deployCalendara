@@ -19,6 +19,9 @@ import Terms from "./Pages/Terms";
 import PrivacyPolicy from "./Pages/PrivacyPolicy";
 import Dashboard from "./Pages/Dashboard";
 import Auth from "./Pages/Auth";
+import AccountSettings from "./Pages/AccountSettings";
+import MoreSettings from "./Pages/MoreSettings";
+import Reminders from "./Pages/Reminders";
 import Error404 from "./Pages/Error404";
 
 import UpdateProfile from "./Components/Profile/UpdateProfile";
@@ -35,6 +38,11 @@ function App() {
     const user = localStorage.getItem("token");
 
     const [mode, setMode] = useState(localStorage.getItem("mode") || "light");
+
+    const [eventsCount, setEventsCount] = useState(0);
+    const handleEventsCountChange = (count) => {
+        setEventsCount(count);
+    };
 
     useEffect(() => {
         const savedMode = localStorage.getItem("mode") || "light";
@@ -82,6 +90,7 @@ function App() {
                             <NavbarLoggedIn
                                 mode={mode}
                                 toggleMode={toggleMode}
+                                eventsCount={eventsCount}
                             />
                         ) : (
                             <NavbarLoggedOut
@@ -137,12 +146,31 @@ function App() {
                                     element={<UploadEvents mode={mode} />}
                                 />
                                 <Route
+                                    path="/profile/account-settings"
+                                    element={<AccountSettings mode={mode} />}
+                                />
+                                <Route
+                                    path="/profile/more-settings"
+                                    element={<MoreSettings mode={mode} />}
+                                />
+                                <Route
                                     path="/add-event"
                                     element={<AddEvents mode={mode} />}
                                 />
                                 <Route
                                     path="/dashboard"
                                     element={<Dashboard mode={mode} />}
+                                />
+                                <Route
+                                    path="/reminders"
+                                    element={
+                                        <Reminders
+                                            mode={mode}
+                                            onEventsCountChange={
+                                                handleEventsCountChange
+                                            }
+                                        />
+                                    }
                                 />
                                 <Route
                                     path="/about-us"

@@ -1,10 +1,46 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Tooltip, Cell } from "recharts";
+import axios from "axios";
+
+
 
 const UpcomingEvents = (props) => {
+    
+    const [upcomingEventsCount, setUpcomingEventsCount] = useState(0);
+    const [totalEventsCount, setTotalEventsCount] = useState(0);
+    const userName = localStorage.getItem("userName");
+
+    useEffect(() => {
+        const fetchTotalEventsData = async () => {
+            try {
+                const response = await axios.get(`https://calendarabackend.onrender.com/api/reminders/total/${userName}`);
+                const events = response.data;
+                setTotalEventsCount(events.length);
+            } catch (error) {
+                console.error("Error fetching upcoming events:", error);
+            }
+        };
+
+        fetchTotalEventsData();
+    }, [userName]);
+    
+    useEffect(() => {
+        const fetchUpcomingEventsData = async () => {
+            try {
+                const response = await axios.get(`https://calendarabackend.onrender.com/api/reminders/upcoming/${userName}`);
+                const events = response.data;
+                setUpcomingEventsCount(events.length);
+            } catch (error) {
+                console.error("Error fetching upcoming events:", error);
+            }
+        };
+
+        fetchUpcomingEventsData();
+    }, [userName]);
+
     const data = [
-        { name: "Completed Events", value: 2400 },
-        { name: "Total Events", value: 4567 },
+        { name: "Upcoming Events", value: upcomingEventsCount },
+        { name: "Total Events", value: totalEventsCount },
     ];
 
     const totalEventsColor = props.mode === "light" ? "#e6e6e6" : "#474b52";

@@ -16,7 +16,7 @@ const UpdateProfile = (props) => {
                 const profileData = reader.result;
                 setProfileImageData(profileData);
                 localStorage.setItem("userProfileImage", profileData);
-                setProfileImagePreview(profileData);  // Set image preview
+                setProfileImagePreview(profileData); // Set image preview
             };
 
             reader.readAsDataURL(file);
@@ -25,41 +25,41 @@ const UpdateProfile = (props) => {
 
     const storeProfileImage = async () => {
         if (profileImageData) {
+            const email = localStorage.getItem("email");
+            const deleteurl = `https://calendarabackend.onrender.com/api/profilepic/${email}`;
+            await axios.delete(deleteurl);
 
-        const email = localStorage.getItem("email");
-        const deleteurl = `https://calendarabackend.onrender.com/api/profilepic/${email}`;
-        await axios.delete(deleteurl);
+            try {
+                const url = "https://calendarabackend.onrender.com/api/profilepic";
 
-        try {
-           const url = "https://calendarabackend.onrender.com/api/profilepic";
+                const email = localStorage.getItem("email");
+                const imageData = localStorage.getItem("userProfileImage");
 
-           const email = localStorage.getItem("email");
-           const imageData = localStorage.getItem("userProfileImage");
+                const profileData = {
+                    email: email,
+                    imageData: imageData,
+                };
 
-           const profileData = {
-            email: email,
-            imageData: imageData,
-        };
+                const response = await axios.post(url, profileData);
+                console.log(profileData);
 
-            const response = await axios.post(url, profileData);
-            console.log(profileData);
-
-            if (response.data.success) {
-                setSuccessProfileMesage("Image successfully updated!");
-            } else {
-                console.error("Failed to update image");
+                if (response.data.success) {
+                    setSuccessProfileMesage("Image successfully updated!");
+                } else {
+                    console.error("Failed to update image");
+                }
+            } catch (error) {
+                console.error("Error updating image:", error);
             }
-        } catch (error) {
-            console.error("Error updating image:", error);
+        } else {
+            alert("Please upload an image!");
         }
-     } else {
-        alert("Please enter an image!")
-    }
-};
+    };
 
     const [backgroundImageData, setBackgroundImageData] = useState("");
     const [backgroundImagePreview, setBackgroundImagePreview] = useState(null);
-    const [backgroundSuccessMessage, setBackgroundSuccessMessage] = useState(null);
+    const [backgroundSuccessMessage, setBackgroundSuccessMessage] =
+        useState(null);
 
     const handleBackgroundImageChange = (e) => {
         const file = e.target.files[0];
@@ -79,49 +79,105 @@ const UpdateProfile = (props) => {
     };
 
     const storeBackgroundImage = async () => {
-
         if (backgroundImageData) {
-
             const email = localStorage.getItem("email");
             const deleteurl = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
             await axios.delete(deleteurl);
 
             try {
-                
                 const url = "https://calendarabackend.onrender.com/api/profilebgpic";
 
                 const email = localStorage.getItem("email");
                 const bgimageData = localStorage.getItem("userBGImage");
-                
+
                 const profileData = {
                     email: email,
                     bgimageData: bgimageData,
                 };
                 const response = await axios.post(url, profileData);
                 console.log(profileData);
-                
+
                 if (response.data.success) {
-                    
                     setBackgroundSuccessMessage("Image successfully updated!");
-                
                 } else {
-                    
                     console.error("Failed to update image");
-                
                 }
-            
             } catch (error) {
-                
                 console.error("Error updating image:", error);
-            
             }
-        
         } else {
-            
-            alert("Please enter an image!")
-        
+            alert("Please upload an image!");
         }
-        
+    };
+
+    const [newUserName, setNewUserName] = useState("");
+    const [newContactNumber, setNewContactNumber] = useState("");
+    const [newEmail, setNewEmail] = useState("");
+
+    const updateUserName = async () => {
+        const email = localStorage.getItem("email");
+
+        try {
+            const url = `https://calendarabackend.onrender.com/api/updateUserName/${email}`;
+
+            const data = {
+                newUserName: newUserName,
+            };
+
+            const response = await axios.post(url, data);
+
+            if (response.data.success) {
+                console.log("User name successfully updated!");
+            } else {
+                console.error("Failed to update user name");
+            }
+        } catch (error) {
+            console.error("Error updating user name:", error);
+        }
+    };
+
+    const updateContactNumber = async () => {
+        const email = localStorage.getItem("email");
+
+        try {
+            const url = `https://calendarabackend.onrender.com/api/updateContactNumber/${email}`;
+
+            const data = {
+                newContactNumber: newContactNumber,
+            };
+
+            const response = await axios.post(url, data);
+
+            if (response.data.success) {
+                console.log("Contact number successfully updated!");
+            } else {
+                console.error("Failed to update contact number");
+            }
+        } catch (error) {
+            console.error("Error updating contact number:", error);
+        }
+    };
+
+    const updateEmail = async () => {
+        const email = localStorage.getItem("email");
+
+        try {
+            const url = `https://calendarabackend.onrender.com/api/updateEmail/${email}`;
+
+            const data = {
+                newEmail: newEmail,
+            };
+
+            const response = await axios.post(url, data);
+
+            if (response.data.success) {
+                console.log("Email successfully updated!");
+            } else {
+                console.error("Failed to update email");
+            }
+        } catch (error) {
+            console.error("Error updating email:", error);
+        }
     };
 
     return (
@@ -293,11 +349,14 @@ const UpdateProfile = (props) => {
                                     props.mode === "light" ? "" : "#e6e6e6",
                             }}
                             placeholder="New User Name"
+                            value={newUserName}
+                            onChange={(e) => setNewUserName(e.target.value)}
                         />
                         <button
                             className={`btn btn-${
                                 props.mode === "light" ? "primary" : "warning"
                             }`}
+                            onClick={updateUserName}
                         >
                             Update
                         </button>
@@ -335,11 +394,16 @@ const UpdateProfile = (props) => {
                                     props.mode === "light" ? "" : "#e6e6e6",
                             }}
                             placeholder="New Contact Number"
+                            value={newContactNumber}
+                            onChange={(e) =>
+                                setNewContactNumber(e.target.value)
+                            }
                         />
                         <button
                             className={`btn btn-${
                                 props.mode === "light" ? "primary" : "warning"
                             }`}
+                            onClick={updateContactNumber}
                         >
                             Update
                         </button>
@@ -376,66 +440,17 @@ const UpdateProfile = (props) => {
                                     props.mode === "light" ? "" : "#e6e6e6",
                             }}
                             placeholder="New Email"
+                            value={newEmail}
+                            onChange={(e) => setNewEmail(e.target.value)}
                         />
                         <button
                             className={`btn btn-${
                                 props.mode === "light" ? "primary" : "warning"
                             }`}
+                            onClick={updateEmail}
                         >
                             Update
                         </button>
-                    </div>
-                </div>
-            </div>
-            <div className="container my-5">
-                <h3
-                    className={`text-${
-                        props.mode === "light" ? "black" : "white"
-                    }`}
-                >
-                    Update Password
-                </h3>
-                <div className="container mt-3" style={{ width: "50%" }}>
-                    <div className="mb-3">
-                        <input
-                            type="text"
-                            className={`form-control ${
-                                props.mode === "light" ? "" : "border-secondary"
-                            }`}
-                            style={{
-                                backgroundColor:
-                                    props.mode === "light" ? "" : "#4d4d4d",
-                                WebkitTextFillColor:
-                                    props.mode === "light" ? "" : "#e6e6e6",
-                            }}
-                            placeholder="Enter Current Password"
-                        />
-                        <div className="input-group mt-3">
-                            <input
-                                type="text"
-                                className={`form-control ${
-                                    props.mode === "light"
-                                        ? ""
-                                        : "border-secondary"
-                                }`}
-                                style={{
-                                    backgroundColor:
-                                        props.mode === "light" ? "" : "#4d4d4d",
-                                    WebkitTextFillColor:
-                                        props.mode === "light" ? "" : "#e6e6e6",
-                                }}
-                                placeholder="Enter New Password"
-                            />
-                            <button
-                                className={`btn btn-${
-                                    props.mode === "light"
-                                        ? "primary"
-                                        : "warning"
-                                }`}
-                            >
-                                Update
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>

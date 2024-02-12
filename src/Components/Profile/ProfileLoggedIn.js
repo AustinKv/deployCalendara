@@ -1,12 +1,14 @@
 import React from "react";
 import { useState } from "react";
-import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+
+import axios from "axios";
 
 const ProfileLoggedIn = (props) => {
     const [userName] = useState(localStorage.getItem("userName") || "");
     const [contact] = useState(localStorage.getItem("contact") || "");
     const [email] = useState(localStorage.getItem("email") || "");
+    const [eventTitle1Day, setEventTitle1Day] = useState([]);
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -20,6 +22,35 @@ const ProfileLoggedIn = (props) => {
     };
 
     const defaultBackgroundImage = `/Images/Logo/calendara_${props.mode}.png`;
+
+    const recipient = localStorage.getItem("email");
+
+    const sendEmail = async () => {
+        try {
+
+            const response = await axios.get(
+                `https://calendarabackend.onrender.com/api/reminders/1day/${userName}`
+            );
+            setEventTitle1Day(response.data[0].title)
+            console.log(response.data[0].title)
+
+            const response1 = await axios.post(
+                "https://calendarabackend.onrender.com/api/sendMail",
+                {
+                    recipient,
+                    eventTitle1Day,
+                }
+            );
+
+            if (response.status && response1.status === 200) {
+                console.log("Email sent successfully");
+            } else {
+                console.error("Failed to send email");
+            }
+        } catch (error) {
+            console.error("Error sending email:", error);
+        }
+    };
 
     return (
         <>
@@ -129,38 +160,32 @@ const ProfileLoggedIn = (props) => {
                             >
                                 Upload Data
                             </Link>
-                            <Button
-                                variant={
+                            <Link
+                                to="/profile/account-settings"
+                                className={`btn btn-lg btn-${
                                     props.mode === "dark" ? "light" : "primary"
                                 }
-                                className="btn-lg"
+                                `}
                             >
                                 Account Settings
-                            </Button>
-                            <Button
-                                variant={
+                            </Link>
+                            <Link
+                                to="/profile/more-settings"
+                                className={`btn btn-lg btn-${
                                     props.mode === "dark" ? "light" : "primary"
                                 }
-                                className="btn-lg"
+                                `}
                             >
-                                Notifications
-                            </Button>
-                            <Button
-                                variant={
-                                    props.mode === "dark" ? "light" : "primary"
-                                }
-                                className="btn-lg"
-                            >
-                                More
-                            </Button>
-                            <Button
+                                More Settings
+                            </Link>
+                            <button
                                 className="btn btn-lg btn-danger mb-5"
                                 onClick={handleLogout}
                             >
                                 Sign Out
-                            </Button>
+                            </button>
                         </div>
-                        <div className="col d-flex align-items-center justify-content-center">
+                        <div className="col d-flex align-items-center justify-content-center mb-5">
                             <div className="container">
                                 <div
                                     className="row mx-0 rounded w-75"
@@ -212,6 +237,31 @@ const ProfileLoggedIn = (props) => {
                                         >
                                             View Full Analysis
                                         </Link>
+                                    </div>
+                                </div>
+                                <div className="my-5">
+                                    <div>
+                                        <p
+                                            className={`text-${
+                                                props.mode === "light"
+                                                    ? "black"
+                                                    : "white"
+                                            }`}
+                                        >
+                                            Email: {recipient}
+                                        </p>
+
+                                        <button
+                                            type="button"
+                                            onClick={sendEmail}
+                                            className={`btn btn-${
+                                                props.mode === "light"
+                                                    ? "dark"
+                                                    : "light"
+                                            }`}
+                                        >
+                                            Send Email
+                                        </button>
                                     </div>
                                 </div>
                             </div>

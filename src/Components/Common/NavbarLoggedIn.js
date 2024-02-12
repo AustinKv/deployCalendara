@@ -1,16 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal, Dropdown } from "react-bootstrap";
+import axios from "axios";
 
 const NavbarLoggedIn = (props) => {
     const [show, setShow] = useState(false);
-
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-
     const [showCalendarDropdown, setShowCalendarDropdown] = useState(false);
+    const [events, setEvents] = useState([]);
+    const [filteredEvents, setFilteredEvents] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const userName = localStorage.getItem("userName");
+    const eventsCount = parseInt(localStorage.getItem("eventsCount")) || 0;
+    const navigate = useNavigate();
+
+    const fetchEvents = useCallback(async () => {
+        try {
+            const response = await axios.get(
+                `https://calendarabackend.onrender.com/api/events/${userName}`
+            );
+            setEvents(response.data);
+            setFilteredEvents(response.data);
+        } catch (error) {
+            console.error("Error fetching events:", error);
+        }
+    }, [userName]);
+
+    const filterEventsByTitle = useCallback(() => {
+        const filtered = events.filter((event) =>
+            event.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredEvents(filtered);
+    }, [searchQuery, events]);
+
+    useEffect(() => {
+        fetchEvents();
+    }, [fetchEvents]);
+
+    useEffect(() => {
+        filterEventsByTitle();
+    }, [searchQuery, events, filterEventsByTitle]);
+
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
+
+    const handleClose = () => {
+        setShow(false);
+        setSearchQuery(""); // Reset search query when modal is closed
+    };
+
+    const handleShow = () => {
+        setShow(true);
+        fetchEvents(); // Fetch events again when modal is shown
+    };
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -21,8 +64,6 @@ const NavbarLoggedIn = (props) => {
         localStorage.removeItem("userBGImage");
         window.location.reload();
     };
-
-    const navigate = useNavigate();
 
     return (
         <>
@@ -228,8 +269,10 @@ const NavbarLoggedIn = (props) => {
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                placeholder="What are you looking for..."
-                                                aria-label="Search"
+                                                placeholder="Search by Event Title..."
+                                                value={searchQuery}
+                                                onChange={handleSearchChange}
+                                                aria-label="Search Event Title"
                                                 style={{
                                                     backgroundColor:
                                                         props.mode === "light"
@@ -251,9 +294,54 @@ const NavbarLoggedIn = (props) => {
                                             props.mode === "light"
                                                 ? "white"
                                                 : "#36393e",
+                                        height: "25rem",
+                                        overflowY: "auto",
                                     }}
                                 >
-                                    <div style={{ height: "50vh" }}></div>
+                                    {/* Add a conditional check for displaying events */}
+                                    {searchQuery !== "" ? (
+                                        filteredEvents.map((event) => (
+                                            <div
+                                                key={event._id}
+                                                className={`mt-2    mb-5 text-${
+                                                    props.mode === "light"
+                                                        ? "black"
+                                                        : "white"
+                                                }`}
+                                            >
+                                                <h3>{event.title}</h3>
+                                                <p>
+                                                    <strong>Start:</strong>{" "}
+                                                    {new Date(
+                                                        event.start
+                                                    ).toLocaleString()}
+                                                </p>
+                                                <p>
+                                                    <strong>End:</strong>{" "}
+                                                    {new Date(
+                                                        event.end
+                                                    ).toLocaleString()}
+                                                </p>
+                                                <p>
+                                                    <strong>
+                                                        Description:
+                                                    </strong>{" "}
+                                                    {event.describe}
+                                                </p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p
+                                            className={`text-${
+                                                props.mode === "light"
+                                                    ? "black"
+                                                    : "light"
+                                            }`}
+                                        >
+                                            Enter a search query to find events
+                                            by title.
+                                        </p>
+                                    )}
                                 </Modal.Body>
 
                                 <Modal.Footer
@@ -281,6 +369,28 @@ const NavbarLoggedIn = (props) => {
                                 </Modal.Footer>
                             </Modal>
                         </div>
+
+                        <Link
+                            to="/reminders"
+                            className="me-4 position-relative"
+                            type="button"
+                        >
+                            <i
+                                className={`bi bi-bell text-${
+                                    props.mode === "light" ? "black" : "white"
+                                }`}
+                                style={{ fontSize: "1.5rem" }}
+                            ></i>
+                            <span
+                                className={`badge position-absolute text-bg-${
+                                    props.mode === "light"
+                                        ? "danger"
+                                        : "warning"
+                                }`}
+                            >
+                                {eventsCount}
+                            </span>
+                        </Link>
 
                         <Dropdown
                             show={showProfileDropdown}

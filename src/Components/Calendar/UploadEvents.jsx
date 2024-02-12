@@ -1,69 +1,105 @@
 import React, { useState } from "react";
-import Papa from "papaparse";
-import * as XLSX from "xlsx";
 import { addEventApi } from "../../Redux/actions";
 import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
+import axios from "axios";
 
 const UploadEvents = (props) => {
-    const [data, setData] = useState([]);
-
     const navigate = useNavigate();
 
-    const [userName] = useState(localStorage.getItem("userName") || "");
-
-    const startdate = "2024-01-20";
-    const enddate = "2024-01-21";
-    const userColor = "#FF6900";
-
-    const handleCsvFileUpload = (e) => {
-        const file = e.target.files[0];
-        Papa.parse(file, {
-            header: true,
-            complete: (results) => {
-                setData(results.data);
-            },
-        });
+    const handleCsvDownload = () => {
+        const downloadLink = document.createElement("a");
+        downloadLink.href =
+            process.env.PUBLIC_URL + "/Templates/csv_template.csv";
+        downloadLink.download = "csv_template.csv";
+        downloadLink.click();
     };
 
-    const handleXlsxFileUpload = (e) => {
-        const file = e.target.files[0];
+    const handleXlsxDownload = () => {
+        const downloadLink = document.createElement("a");
+        downloadLink.href =
+            process.env.PUBLIC_URL + "/Templates/xlsx_template.xlsx";
+        downloadLink.download = "xlsx_template.xlsx";
+        downloadLink.click();
+    };
 
-        if (file && file.name.endsWith(".xlsx")) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: "array" });
+    const [csvFile, setCsvFile] = useState(null);
+    const [excelFile, setExcelFile] = useState(null);
 
-                const sheetName = workbook.SheetNames[0];
-                const sheet = workbook.Sheets[sheetName];
+    const userName = localStorage.getItem("userName");
 
-                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    const handleCSVChange = (e) => {
+        setCsvFile(e.target.files[0]);
+    };
 
-                setData(jsonData);
-            };
-            reader.readAsArrayBuffer(file);
+    const handleExcelChange = (e) => {
+        setExcelFile(e.target.files[0]);
+    };
+
+    const handleCsvUpload = async () => {
+        if (!csvFile) {
+            alert("Please select a CSV file.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("csvFile", csvFile);
+
+        try {
+            // Upload the CSV file to the server
+            const uploadResponse = await axios.post(
+                `https://calendarabackend.onrender.com/api/uploadCSV/${userName}`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            // Log the response from the server (API calls completion message)
+            console.log(uploadResponse.data);
+
+            // Optionally, you can handle the response or provide user feedback
+            alert("CSV file uploaded and Events are created!");
+            navigate("/events");
+        } catch (error) {
+            console.error("Error uploading CSV file:", error.response.data);
+            // Handle the error as needed
         }
     };
 
-    const onSubmit = async () => {
-        const values = {
-            admin: userName,
-            title: "Upload",
-            start: `${startdate}T09:30:00.000+00:00`,
-            end: `${enddate}T14:30:00.000+00:00`,
-            describe: "",
-            color: userColor || "#3174ad",
-        };
+    const handleXlsxUpload = async () => {
+        if (!excelFile) {
+            alert("Please select a Excel file.");
+            return;
+        }
 
-        props.addEventApi(values)
-            .then(() => {
-                window.alert("Uploaded Events!");
-                navigate("/events");
-            })
-            .catch((error) => {
-                console.error("Error uploading events:", error);
-            });
+        const formData = new FormData();
+        formData.append("excelFile", excelFile);
+
+        try {
+            // Upload the Excel file to the server
+            const uploadResponse = await axios.post(
+                `https://calendarabackend.onrender.com/api/uploadXLSX/${userName}`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            // Log the response from the server (API calls completion message)
+            console.log(uploadResponse.data);
+
+            // Optionally, you can handle the response or provide user feedback
+            alert("XLSX file uploaded and Events are created!");
+            navigate("/events");
+        } catch (error) {
+            console.error("Error uploading XLSX file:", error.response.data);
+            // Handle the error as needed
+        }
     };
 
     return (
@@ -83,96 +119,76 @@ const UploadEvents = (props) => {
                 >
                     Note: We accept only .csv or .xlsx formats only (as of now)
                 </p>
-            </div>
-            <div className="container">
-                <label
-                    htmlFor=""
+                <p
                     className={`text-${
                         props.mode === "light" ? "black" : "white"
                     }`}
                 >
-                    .csv file
-                </label>
+                    Download Template(s):
+                </p>
+
+                <button
+                    onClick={handleCsvDownload}
+                    className="btn btn-info me-1"
+                >
+                    Download .csv template
+                </button>
+                <button
+                    onClick={handleXlsxDownload}
+                    className="btn btn-info ms-1"
+                >
+                    Download .xlsx template
+                </button>
+            </div>
+            <div className="container my-5" style={{ width: "50%" }}>
                 <input
+                    className={`form-control ${
+                        props.mode === "light" ? "" : "border-secondary"
+                    }`}
+                    style={{
+                        backgroundColor:
+                            props.mode === "light" ? "" : "#4d4d4d",
+                        WebkitTextFillColor:
+                            props.mode === "light" ? "" : "#e6e6e6",
+                    }}
                     type="file"
                     accept=".csv"
-                    onChange={handleCsvFileUpload}
-                    className="form-control w-25 my-3"
-                    style={{
-                        backgroundColor:
-                            props.mode === "light" ? "" : "#4d4d4d",
-                        WebkitTextFillColor:
-                            props.mode === "light" ? "black" : "#e6e6e6",
-                    }}
+                    onChange={handleCSVChange}
+                    required
                 />
-
-                {data.length ? (
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Gender</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.map((row, index) => (
-                                <tr key={index}>
-                                    <td>{row.name}</td>
-                                    <td>{row.gender}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                ) : null}
-            </div>
-            <div className="container mb-5">
-                <label
-                    htmlFor=""
-                    className={`text-${
-                        props.mode === "light" ? "black" : "white"
-                    }`}
-                >
-                    .xlsx file
-                </label>
-                <input
-                    type="file"
-                    accept=".xlsx"
-                    onChange={handleXlsxFileUpload}
-                    className="form-control w-25 my-3"
-                    style={{
-                        backgroundColor:
-                            props.mode === "light" ? "" : "#4d4d4d",
-                        WebkitTextFillColor:
-                            props.mode === "light" ? "black" : "#e6e6e6",
-                    }}
-                />
-
-                {data.length ? (
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Gender</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.map((row, index) => (
-                                <tr key={index}>
-                                    <td>{row[0]}</td>
-                                    <td>{row[1]}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                ) : null}
-            </div>
-            <div className="container mb-5">
                 <button
                     type="submit"
-                    className="btn btn-success btn-lg"
-                    onClick={onSubmit}
+                    className="btn btn-success btn-lg mt-3"
+                    onClick={handleCsvUpload}
                 >
-                    Create
+                    Upload .csv
+                </button>
+            </div>
+            <div
+                className="container mb-5"
+                style={{ width: "50%", marginTop: "7rem" }}
+            >
+                <input
+                    className={`form-control ${
+                        props.mode === "light" ? "" : "border-secondary"
+                    }`}
+                    style={{
+                        backgroundColor:
+                            props.mode === "light" ? "" : "#4d4d4d",
+                        WebkitTextFillColor:
+                            props.mode === "light" ? "" : "#e6e6e6",
+                    }}
+                    type="file"
+                    accept=".xlsx"
+                    onChange={handleExcelChange}
+                    required
+                />
+                <button
+                    type="submit"
+                    className="btn btn-success btn-lg mt-3"
+                    onClick={handleXlsxUpload}
+                >
+                    Upload .xlsx
                 </button>
             </div>
         </>
@@ -189,4 +205,3 @@ function mapStateToProps({ event, error }) {
 export default connect(mapStateToProps, (dispatch) => ({
     addEventApi: (values) => addEventApi(values)(dispatch),
 }))(UploadEvents);
- 
