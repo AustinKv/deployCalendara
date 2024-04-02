@@ -1,3 +1,4 @@
+//React imports
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { Controller, useForm } from "react-hook-form";
@@ -6,10 +7,11 @@ import * as yup from "yup";
 import { ShowEventsApi, updateEventApi } from "../../Redux/actions";
 import { connect } from "react-redux";
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ColorPalette from "./ColorPalette";
 
-//schema to validate event inputs
+
+//validate event inputs
 const schema = yup
     .object({
         title: yup.string().required("Can't Be Empty"),
@@ -21,24 +23,32 @@ const schema = yup
     .required();
 
 const UpdateEvent = ({ updateEventApi, event, error, mode }) => {
+
+    //Hooks
     const navigate = useNavigate();
+    const location = useLocation();
+
+    //States
     const [rerender, setRerender] = useState(false);
     const [dbError, setError] = useState(false);
     const [firstRender, setFirstRender] = useState(true);
+    const { selectedEvent, selectedEventId } = location.state || {};
     const [selectedColor, setSelectedColor] = useState(
-        event.color || "#3174ad"
+        selectedEvent.color || "#2196f3"
     ); // Default color from the event or a default color
+    const [status, setStatus] = useState(selectedEvent.status || "Unresolved");
 
+    //Handling functions
     useEffect(() => {
         console.log(error);
         if (error && !firstRender) {
             setError(error);
         }
         if (!error.start && !error.end && dbError !== false) {
-            setTimeout(navigate("/events"));
+            setTimeout(navigate("/events2"));
         }
     }, [rerender, dbError, error, firstRender, navigate]);
-    //using form-hook to register event data
+
     const {
         register,
         handleSubmit,
@@ -47,24 +57,28 @@ const UpdateEvent = ({ updateEventApi, event, error, mode }) => {
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            title: event.title,
-            start: new Date(event.start),
-            end: event.end ? new Date(event.end) : "",
-            describe: event.describe
-                ? event.describe
-                : "No description was provided",
-            color: event.color || "#3174ad", // Default color from the event or a default color
+            title: selectedEvent.title,
+            start: new Date(selectedEvent.start),
+            end: selectedEvent.end ? new Date(selectedEvent.end) : "",
+            describe: selectedEvent.describe
+                ? selectedEvent.describe
+                : " ",
+            color: selectedEvent.color || "#3174ad",
+            allDay: selectedEvent.allDay,
+            status: status,
         },
     });
 
     const onSubmit = async (values) => {
         setFirstRender(false);
         values.color = selectedColor; // Add the color to the values object
-        updateEventApi(values, event.id).then((res) => {
+        values.status = status;
+        updateEventApi(values, selectedEventId).then((res) => {
             console.log(res);
             setRerender(!rerender);
             if (res === "response was successful") {
-                navigate("/events");
+                window.alert("Event updated successfully!");
+                navigate("/events2");
             }
         });
     };
@@ -175,6 +189,22 @@ const UpdateEvent = ({ updateEventApi, event, error, mode }) => {
                                 {dbError.start}
                             </p>
                         </div>
+
+                        <div className="mb-3" style={{ zIndex: "100" }}>
+        
+                            <label htmlFor="allDay" className={`form-label me-4 text-${
+                      mode === "light" ? "black" : "white"
+                    }`}>All Day:</label>
+
+                                <input
+                                    type="checkbox"
+                                    {...register("allDay")}
+                                    id="allDay"
+                                    className={`form-check-input`} 
+                                />
+
+                        </div>
+
                         <div className="mb-4" style={{ zIndex: "100" }}>
                             <label
                                 htmlFor="end"
@@ -237,6 +267,60 @@ const UpdateEvent = ({ updateEventApi, event, error, mode }) => {
                                 {dbError.end}
                             </p>
                         </div>
+
+                        <div className="mb-4">
+                                <label
+                                    className={`form-label text-${
+                                        mode === "light" ? "black" : "white"
+                                    }`}
+                                >
+                                    Status:
+                                </label>
+                                <div>
+                                    <input
+                                        type="radio"
+                                        id="completed"
+                                        name="status"
+                                        value="Completed"
+                                        checked={status === "Completed"}
+                                        onChange={(e) =>
+                                            setStatus(e.target.value)
+                                        }
+                                    />
+                                    <label htmlFor="completed" className={`form-label ms-2 me-4 text-${
+                                        mode === "light" ? "black" : "white"
+                                    }`}>Completed</label>
+
+                                    <input
+                                        type="radio"
+                                        id="overdue"
+                                        name="status"
+                                        value="Overdue"
+                                        checked={status === "Overdue"}
+                                        onChange={(e) =>
+                                            setStatus(e.target.value)
+                                        }
+                                    />
+                                    <label htmlFor="overdue" className={`form-label ms-2 me-4 text-${
+                                        mode === "light" ? "black" : "white"
+                                    }`}>Overdue</label>
+
+                                    <input
+                                        type="radio"
+                                        id="upcoming"
+                                        name="status"
+                                        value="Upcoming"
+                                        checked={status === "Upcoming"}
+                                        onChange={(e) =>
+                                            setStatus(e.target.value)
+                                        }
+                                    />
+                                    <label htmlFor="upcoming" className={`form-label ms-2 me-4 text-${
+                                        mode === "light" ? "black" : "white"
+                                    }`}>Upcoming</label>
+                                </div>
+                            </div>
+
                         <div className="mb-4">
                             <label
                                 htmlFor="describe"

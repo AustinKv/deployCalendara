@@ -18,32 +18,57 @@ const DarkMode = () => {
         "#36393e"
     );
 
+    document.documentElement.style.setProperty("--fc-toolbar-title", "white");
     document.documentElement.style.setProperty(
-        "--rbc-toolbar-label-color",
+        "--fc-col-header-cell-cushion",
         "white"
     );
-    document.documentElement.style.setProperty("--rbc-header-color", "white");
     document.documentElement.style.setProperty(
-        "--rbc-date-cell-color",
-        "#e6e6e6"
+        "--fc-daygrid-day-number",
+        "white"
     );
     document.documentElement.style.setProperty(
-        "--rbc-off-range-bg-color",
-        "#474b52"
-    );
-    document.documentElement.style.setProperty("--rbc-today-color", "#242629");
-    document.documentElement.style.setProperty(
-        "--rbc-btn-group-color",
-        "#666B74"
-    );
-    document.documentElement.style.setProperty("--rbc-active-color", "#242629");
-    document.documentElement.style.setProperty(
-        "--rbc-btn-text-color",
-        "#e6e6e6"
+        "--fc-multimonth-title",
+        "white"
     );
     document.documentElement.style.setProperty(
-        "--rbc-btn-hover-color",
-        "#2f3237"
+        "--fc-scrollgrid-shrink-cushion",
+        "white"
+    );
+    document.documentElement.style.setProperty(
+        "--fc-list-day-side-text",
+        "black"
+    );
+    document.documentElement.style.setProperty("--fc-list-day-text", "black");
+    document.documentElement.style.setProperty(
+        "--fc-button-background",
+        "#1e1e1e"
+    );
+    document.documentElement.style.setProperty(
+        "--fc-button-active-background",
+        "#696969"
+    );
+    document.documentElement.style.setProperty("--fc-button-color", "white");
+    document.documentElement.style.setProperty(
+        "--fc-daygrid-day-frame",
+        "#36393e"
+    );
+    document.documentElement.style.setProperty(
+        "--fc-timegrid-axis-color",
+        "#36393e"
+    );
+    document.documentElement.style.setProperty(
+        "--fc-list-day-cushion",
+        "#606060"
+    );
+    document.documentElement.style.setProperty(
+        "--fc-list-event-title-and-time",
+        "#36383e"
+    );
+    document.documentElement.style.setProperty("--fc-text", "white");
+    document.documentElement.style.setProperty(
+        "--fc-scrollgrid-sync-inner",
+        "gray"
     );
 
     document.documentElement.style.setProperty("--datepicker-color", "#666B74");

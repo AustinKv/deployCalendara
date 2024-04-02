@@ -1,14 +1,54 @@
-import React from "react";
-import { useState } from "react";
+//React imports
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
 import axios from "axios";
 
 const ProfileLoggedIn = (props) => {
+    //States
     const [userName] = useState(localStorage.getItem("userName") || "");
     const [contact] = useState(localStorage.getItem("contact") || "");
     const [email] = useState(localStorage.getItem("email") || "");
-    const [eventTitle1Day, setEventTitle1Day] = useState([]);
+    const [eventTitles1Day, setEventTitles1Day] = useState([]);
+    const resolvedEventsCount = localStorage.getItem("resolvedEventsCount");
+    const unresolvedEventsCount = localStorage.getItem("unresolvedEventsCount");
+
+    const [isEnabled, setIsEnabled] = useState("Enable");
+    localStorage.setItem("isEnabled", false);
+
+    const toggleIsEnabled = () => {
+        if (isEnabled === "Enable") {
+            setIsEnabled("Disable");
+        } else {
+            setIsEnabled("Enable");
+        }
+    };
+
+    //Handling functions
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:55555/api/reminders/1day/${userName}`
+                );
+
+                console.log("API Response:", response.data);
+
+                if (response.data && response.data.length > 0) {
+                    const eventTitles = response.data.map(
+                        (event) => event.title
+                    );
+                    console.log("Event Titles:", eventTitles);
+                    setEventTitles1Day(eventTitles);
+                } else {
+                    console.error("No events found in the API response");
+                }
+            } catch (error) {
+                console.error("Error fetching events:", error);
+            }
+        };
+
+        fetchEvents();
+    }, [userName, setEventTitles1Day]);
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -17,6 +57,11 @@ const ProfileLoggedIn = (props) => {
         localStorage.removeItem("email");
         localStorage.removeItem("userProfileImage");
         localStorage.removeItem("userBGImage");
+        localStorage.removeItem("completedEventsCount");
+        localStorage.removeItem("categoryColor");
+        localStorage.removeItem("overdueEventsCount");
+        localStorage.removeItem("eventsCount");
+        localStorage.removeItem("selectedColor");
 
         window.location.reload();
     };
@@ -27,25 +72,28 @@ const ProfileLoggedIn = (props) => {
 
     const sendEmail = async () => {
         try {
+            console.log("Data to be sent:", {
+                recipient,
+                eventTitles1Day,
+            });
 
-            const response = await axios.get(
-                `https://calendarabackend.onrender.com/api/reminders/1day/${userName}`
-            );
-            setEventTitle1Day(response.data[0].title)
-            console.log(response.data[0].title)
+            if (Array.isArray(eventTitles1Day)) {
+                const response1 = await axios.post(
+                    "http://localhost:55555/api/sendmail",
+                    {
+                        recipient,
+                        eventTitles1Day,
+                    }
+                );
 
-            const response1 = await axios.post(
-                "https://calendarabackend.onrender.com/api/sendMail",
-                {
-                    recipient,
-                    eventTitle1Day,
+                if (response1.status === 200) {
+                    window.alert("Email Sent");
+                    console.log("Email sent successfully");
+                } else {
+                    console.error("Failed to send email");
                 }
-            );
-
-            if (response.status && response1.status === 200) {
-                console.log("Email sent successfully");
             } else {
-                console.error("Failed to send email");
+                console.error("eventTitles1Day is not an array");
             }
         } catch (error) {
             console.error("Error sending email:", error);
@@ -79,7 +127,7 @@ const ProfileLoggedIn = (props) => {
                                                     "userProfileImage"
                                                 ) || props.defaultProfileImg
                                             }
-                                            className="img-fluid"
+                                            className="img-fluid user-pfp"
                                             alt="user profile pic"
                                             style={{
                                                 width: "14rem",
@@ -109,21 +157,21 @@ const ProfileLoggedIn = (props) => {
                                 style={{ marginTop: "43rem" }}
                             >
                                 <p
-                                    className="montserrat-regular-400"
+                                    className="montserrat-regular-400 profile-username"
                                     style={{ fontSize: "2.5rem" }}
                                 >
                                     Name: {userName}
                                 </p>
                                 <br />
                                 <p
-                                    className="montserrat-regular-400"
+                                    className="montserrat-regular-400 profile-contact"
                                     style={{ fontSize: "2rem" }}
                                 >
                                     Contact: {contact}
                                 </p>
                                 <br />
                                 <p
-                                    className="montserrat-regular-400"
+                                    className="montserrat-regular-400 profile-email"
                                     style={{ fontSize: "2rem" }}
                                 >
                                     Email: {email}
@@ -154,7 +202,7 @@ const ProfileLoggedIn = (props) => {
                         >
                             <Link
                                 to="/profile/upload-events"
-                                className={`btn btn-lg mt-3 btn-${
+                                className={`btn btn-lg mt-3 profile-btn btn-${
                                     props.mode === "light" ? "primary" : "light"
                                 }`}
                             >
@@ -162,7 +210,7 @@ const ProfileLoggedIn = (props) => {
                             </Link>
                             <Link
                                 to="/profile/account-settings"
-                                className={`btn btn-lg btn-${
+                                className={`btn btn-lg profile-btn btn-${
                                     props.mode === "dark" ? "light" : "primary"
                                 }
                                 `}
@@ -171,7 +219,7 @@ const ProfileLoggedIn = (props) => {
                             </Link>
                             <Link
                                 to="/profile/more-settings"
-                                className={`btn btn-lg btn-${
+                                className={`btn btn-lg profile-btn btn-${
                                     props.mode === "dark" ? "light" : "primary"
                                 }
                                 `}
@@ -179,7 +227,7 @@ const ProfileLoggedIn = (props) => {
                                 More Settings
                             </Link>
                             <button
-                                className="btn btn-lg btn-danger mb-5"
+                                className="btn btn-lg btn-danger profile-btn mb-5"
                                 onClick={handleLogout}
                             >
                                 Sign Out
@@ -188,7 +236,7 @@ const ProfileLoggedIn = (props) => {
                         <div className="col d-flex align-items-center justify-content-center mb-5">
                             <div className="container">
                                 <div
-                                    className="row mx-0 rounded w-75"
+                                    className="row mx-0 rounded profile-analysis w-75"
                                     style={{
                                         backgroundColor:
                                             props.mode === "light"
@@ -199,33 +247,47 @@ const ProfileLoggedIn = (props) => {
                                 >
                                     <div className="col-12 mt-3">
                                         <p
-                                            className={`text-${
+                                            className={`profile-dashboard text-${
                                                 props.mode === "light"
                                                     ? "black"
                                                     : "white"
                                             }`}
                                             style={{ fontSize: "1.5rem" }}
                                         >
-                                            Events Completed: 5
+                                            Activity - Current Month
                                         </p>
                                     </div>
                                     <div className="col-12">
                                         <p
-                                            className={`text-${
+                                            className={`profile-dashboard text-${
                                                 props.mode === "light"
                                                     ? "black"
                                                     : "white"
                                             }`}
                                             style={{ fontSize: "1.5rem" }}
                                         >
-                                            Events Not Completed: 2
+                                            Resolved Events:{" "}
+                                            {resolvedEventsCount}
+                                        </p>
+                                    </div>
+                                    <div className="col-12">
+                                        <p
+                                            className={`profile-dashboard text-${
+                                                props.mode === "light"
+                                                    ? "black"
+                                                    : "white"
+                                            }`}
+                                            style={{ fontSize: "1.5rem" }}
+                                        >
+                                            Unresolved Events:{" "}
+                                            {unresolvedEventsCount}
                                         </p>
                                     </div>
                                     <hr />
                                     <div className="col-12 mb-3 d-flex justify-content-center">
                                         <Link
                                             to="/dashboard"
-                                            className={`text-${
+                                            className={`profile-dashboard text-${
                                                 props.mode === "light"
                                                     ? "success"
                                                     : "warning"
@@ -248,19 +310,19 @@ const ProfileLoggedIn = (props) => {
                                                     : "white"
                                             }`}
                                         >
-                                            Email: {recipient}
+                                            {isEnabled} email notifications
                                         </p>
 
                                         <button
                                             type="button"
-                                            onClick={sendEmail}
+                                            onClick={toggleIsEnabled}
                                             className={`btn btn-${
                                                 props.mode === "light"
                                                     ? "dark"
                                                     : "light"
                                             }`}
                                         >
-                                            Send Email
+                                            {isEnabled}
                                         </button>
                                     </div>
                                 </div>

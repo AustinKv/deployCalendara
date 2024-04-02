@@ -6,6 +6,9 @@ import axios from "axios";
 const Contact = (props) => {
     const navigate = useNavigate();
 
+    const [messageLength, setMessageLength] = useState(0); // State to store the message length
+    const maxLength = 150; // Set the maximum allowed length for the message
+
     const [data, setData] = useState({
         name: "",
         email: "",
@@ -20,7 +23,7 @@ const Contact = (props) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const url = "https://calendarabackend.onrender.com/api/contactUs";
+        const url = "https://calendarabackend.onrender.com/api/contactus";
 
         try {
             await axios.post(url, data);
@@ -37,7 +40,7 @@ const Contact = (props) => {
 
     return (
         <>
-            <div className="d-flex my-5 justify-content-center">
+            <div className="d-flex my-4 justify-content-center">
                 <h1
                     className={`text-${
                         props.mode === "dark" ? "light" : "dark"
@@ -54,16 +57,18 @@ const Contact = (props) => {
                         } text-center w-responsive mx-auto mb-5`}
                         style={{ fontSize: "1.5rem" }}
                     >
-                        Do you have any questions? Please do not hesitate to
-                        contact us. Our team will come back to you as soon as
-                        possible.
+                        Do you have any questions?
+                        <br />
+                        Please do not hesitate to contact us.
+                        <br />
+                        Our team will come back to you as soon as possible!
                     </p>
                     <div className="row d-flex justify-content-around">
                         <form
                             id="contact-form"
                             name="contact-form"
                             onSubmit={handleSubmit}
-                            className="col-8 w-50"
+                            className="col-lg-6 col-md-8"
                         >
                             <input
                                 type="text"
@@ -81,11 +86,11 @@ const Contact = (props) => {
                                     WebkitTextFillColor:
                                         props.mode === "dark" ? "#BEBEBE" : "",
                                 }}
-                                autoComplete="off"
+                                required
                             />
 
                             <input
-                                type="text"
+                                type="email"
                                 id="email"
                                 name="email"
                                 className="form-control my-3"
@@ -100,7 +105,7 @@ const Contact = (props) => {
                                     WebkitTextFillColor:
                                         props.mode === "dark" ? "#BEBEBE" : "",
                                 }}
-                                autoComplete="off"
+                                required
                             />
 
                             <input
@@ -119,28 +124,55 @@ const Contact = (props) => {
                                     WebkitTextFillColor:
                                         props.mode === "dark" ? "#BEBEBE" : "",
                                 }}
+                                required
+                                autoComplete="off"
                             />
-
-                            <textarea
-                                type="text"
-                                id="message"
-                                name="message"
-                                rows="2"
-                                className="form-control md-textarea"
-                                placeholder="Your message"
-                                value={data.message}
-                                onChange={handleChange}
-                                style={{
-                                    backgroundColor:
-                                        props.mode === "dark"
-                                            ? "#4d4d4d"
-                                            : "white",
-                                    WebkitTextFillColor:
-                                        props.mode === "dark" ? "#BEBEBE" : "",
-                                    minHeight: "5rem",
-                                    maxHeight: "10rem",
-                                }}
-                            ></textarea>
+                            <div style={{ position: "relative" }}>
+                                <textarea
+                                    id="message"
+                                    name="message"
+                                    rows="2"
+                                    className="form-control md-textarea"
+                                    placeholder="Your message"
+                                    value={data.message}
+                                    onChange={(e) => {
+                                        handleChange(e);
+                                        setMessageLength(e.target.value.length);
+                                    }}
+                                    style={{
+                                        backgroundColor:
+                                            props.mode === "dark"
+                                                ? "#4d4d4d"
+                                                : "white",
+                                        WebkitTextFillColor:
+                                            props.mode === "dark"
+                                                ? "#BEBEBE"
+                                                : "",
+                                        minHeight: "5rem",
+                                        maxHeight: "10rem",
+                                        position: "relative",
+                                        padding: "0.5rem",
+                                        boxSizing: "border-box",
+                                    }}
+                                    maxLength={maxLength}
+                                    autoComplete="off"
+                                    required
+                                />
+                                <div
+                                    style={{
+                                        position: "absolute",
+                                        bottom: "0.5rem",
+                                        right: "0.5rem",
+                                        fontSize: "0.8rem",
+                                        color:
+                                            props.mode === "dark"
+                                                ? "#BEBEBE"
+                                                : "#333",
+                                    }}
+                                >
+                                    {messageLength}/{maxLength}
+                                </div>
+                            </div>
                             <button
                                 className={`btn btn-${
                                     props.mode === "light"
@@ -152,7 +184,7 @@ const Contact = (props) => {
                             </button>
                         </form>
 
-                        <div className="col-3 text-center my-3">
+                        <div className="col-lg-6 col-md-8 text-center my-5">
                             <ul
                                 className={`list-unstyled text-${
                                     props.mode === "dark" ? "light" : "dark"
@@ -189,101 +221,6 @@ const Contact = (props) => {
                 </section>
             </div>
             <br />
-            <div className="container my-5">
-                <h4
-                    className={`text-${
-                        props.mode === "dark" ? "light" : "dark"
-                    }`}
-                    style={{ marginLeft: "1.1rem" }}
-                >
-                    Or contact/follow us on social media
-                </h4>
-                <section className="mb-4 my-3">
-                    <a
-                        className={`btn btn-${
-                            props.mode === "dark" ? "dark" : "success"
-                        } btn-floating m-1 mx-3 btn-shadow-${
-                            props.mode === "dark" ? "white" : "green"
-                        }`}
-                        href="https://www.facebook.com/"
-                        role="button"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <i className="bi bi-facebook"></i>
-                    </a>
-
-                    <a
-                        className={`btn btn-${
-                            props.mode === "dark" ? "dark" : "success"
-                        } btn-floating m-1 mx-3 btn-shadow-${
-                            props.mode === "dark" ? "white" : "green"
-                        }`}
-                        href="https://www.whatsapp.com/"
-                        role="button"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <i className="bi bi-whatsapp"></i>
-                    </a>
-
-                    <a
-                        className={`btn btn-${
-                            props.mode === "dark" ? "dark" : "success"
-                        } btn-floating m-1 mx-3 btn-shadow-${
-                            props.mode === "dark" ? "white" : "green"
-                        }`}
-                        href="https://www.instagram.com/"
-                        role="button"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <i className="bi bi-instagram"></i>
-                    </a>
-
-                    <a
-                        className={`btn btn-${
-                            props.mode === "dark" ? "dark" : "success"
-                        } btn-floating m-1 mx-3 btn-shadow-${
-                            props.mode === "dark" ? "white" : "green"
-                        }`}
-                        href="https://www.twitter.com/"
-                        role="button"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <i className="bi bi-twitter-x"></i>
-                    </a>
-
-                    <a
-                        className={`btn btn-${
-                            props.mode === "dark" ? "dark" : "success"
-                        } btn-floating m-1 mx-3 btn-shadow-${
-                            props.mode === "dark" ? "white" : "green"
-                        }`}
-                        href="https://www.linkedin.com/"
-                        role="button"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <i className="bi bi-linkedin"></i>
-                    </a>
-
-                    <a
-                        className={`btn btn-${
-                            props.mode === "dark" ? "dark" : "success"
-                        } btn-floating m-1 mx-3 btn-shadow-${
-                            props.mode === "dark" ? "white" : "green"
-                        }`}
-                        href="https://www.discord.com/"
-                        role="button"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <i className="bi bi-discord"></i>
-                    </a>
-                </section>
-            </div>
         </>
     );
 };

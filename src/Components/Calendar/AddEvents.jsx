@@ -1,3 +1,4 @@
+//React imports
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { Controller, useForm } from "react-hook-form";
@@ -6,54 +7,49 @@ import * as yup from "yup";
 import { addEventApi } from "../../Redux/actions";
 import { connect } from "react-redux";
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ColorPalette from "./ColorPalette";
 
 const schema = yup
     .object({
         title: yup.string().required("Can't Be Empty"),
-        start: yup
-            .date()
-            .required("Please specify the time to start")
-            .test({
-                name: "startBeforeCurrent",
-                message: "Start date must be after the current date and time",
-                test: function (value) {
-                    // Validate that the start date is before the current date and time
-                    return !value || value > new Date();
-                },
-            }),
-        end: yup
-            .date()
-            .required("Please specify the time to end")
-            .test({
-                name: "endBeforeCurrent",
-                message: "End date must be after the current date and time",
-                test: function (value) {
-                    // Validate that the end date is before the current date and time
-                    return !value || value > new Date();
-                },
-            }),
+        start: yup.date().required("Please specify the time to start"),
+        end: yup.date().required("Please specify the time to end"),
     })
     .required();
 
 const AddEvents = ({ addEventApi, error, mode }) => {
+    //Hooks
     const navigate = useNavigate();
+
+    //States
     const [rerender, setRerender] = useState(false);
     const [dbError, setError] = useState(false);
     const [firstRender, setFirstRender] = useState(true);
     const [userName] = useState(localStorage.getItem("userName") || "");
-    const [selectedColor, setSelectedColor] = useState("#3174ad"); // Default color
+    const [selectedColor, setSelectedColor] = useState("#2196f3"); // Default color
 
+    const location = useLocation();
+    const {
+        defaultTitle,
+        defaultDesc,
+        defaultStartDate,
+        defaultEndDate,
+        defaultStatus,
+    } = location.state || {};
+
+    const [status, setStatus] = useState(defaultStatus || "Unresolved");
+
+    //Handling functions
     useEffect(() => {
         if (error && !firstRender) {
             setError(error);
         }
         if (!error.start && !error.end && dbError !== false) {
-            setTimeout(navigate("/events"));
+            setTimeout(navigate("/events2"));
         }
     }, [rerender, error, dbError, firstRender, navigate]);
-    //using form-hook to register event data
+
     const {
         register,
         handleSubmit,
@@ -61,6 +57,13 @@ const AddEvents = ({ addEventApi, error, mode }) => {
         control,
     } = useForm({
         resolver: yupResolver(schema),
+        defaultValues: {
+            title: defaultTitle || "No Title",
+            start: defaultStartDate || null,
+            end: defaultEndDate || null,
+            describe: defaultDesc || "",
+            status: defaultStatus || "Unresolved",
+        },
     });
 
     const onSubmit = async (values) => {
@@ -74,12 +77,13 @@ const AddEvents = ({ addEventApi, error, mode }) => {
         }
 
         values.color = selectedColor;
+        values.status = status;
 
         setFirstRender(false);
         addEventApi(values).then(() => {
             setRerender(!rerender);
             window.alert("Event created successfully!");
-            navigate("/events");
+            navigate("/events2");
         });
     };
 
@@ -87,7 +91,7 @@ const AddEvents = ({ addEventApi, error, mode }) => {
         <>
             <div className="container">
                 <div className="row">
-                    <div className="col-6">
+                    <div className="col-md-6 col-10">
                         <form
                             onSubmit={handleSubmit(onSubmit)}
                             className="container m-5"
@@ -182,8 +186,12 @@ const AddEvents = ({ addEventApi, error, mode }) => {
                                             onChange={(date) =>
                                                 field.onChange(date)
                                             }
-                                            selected={field.value}
-                                            value={field.value}
+                                            selected={
+                                                field.value || defaultStartDate
+                                            }
+                                            value={
+                                                field.value || defaultStartDate
+                                            }
                                             showTimeSelect
                                             timeFormat="HH:mm"
                                             dateFormat="MMMM d, yyyy h:mm aa"
@@ -226,6 +234,25 @@ const AddEvents = ({ addEventApi, error, mode }) => {
                                     {dbError.start}
                                 </p>
                             </div>
+
+                            <div className="mb-3" style={{ zIndex: "100" }}>
+                                <label
+                                    htmlFor="allDay"
+                                    className={`form-label me-4 text-${
+                                        mode === "light" ? "black" : "white"
+                                    }`}
+                                >
+                                    All Day:
+                                </label>
+
+                                <input
+                                    type="checkbox"
+                                    {...register("allDay")}
+                                    id="allDay"
+                                    className={`form-check-input`}
+                                />
+                            </div>
+
                             <div className="mb-4" style={{ zIndex: "100" }}>
                                 <label
                                     htmlFor="end"
@@ -245,8 +272,12 @@ const AddEvents = ({ addEventApi, error, mode }) => {
                                             onChange={(date) =>
                                                 field.onChange(date)
                                             }
-                                            selected={field.value}
-                                            value={field.value}
+                                            selected={
+                                                field.value || defaultEndDate
+                                            }
+                                            value={
+                                                field.value || defaultEndDate
+                                            }
                                             timeFormat="HH:mm"
                                             dateFormat="MMMM d, yyyy h:mm aa"
                                             showTimeSelect
@@ -285,6 +316,87 @@ const AddEvents = ({ addEventApi, error, mode }) => {
                                     {dbError.end}
                                 </p>
                             </div>
+
+                            <div className="mb-4">
+                                <label
+                                    className={`form-label text-${
+                                        mode === "light" ? "black" : "white"
+                                    }`}
+                                >
+                                    Status:
+                                </label>
+                                <div>
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            id="completed"
+                                            name="status"
+                                            value="Completed"
+                                            checked={status === "Completed"}
+                                            onChange={(e) =>
+                                                setStatus(e.target.value)
+                                            }
+                                        />
+                                        <label
+                                            htmlFor="completed"
+                                            className={`form-label ms-2 me-4 text-${
+                                                mode === "light"
+                                                    ? "black"
+                                                    : "white"
+                                            }`}
+                                        >
+                                            Completed
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            id="overdue"
+                                            name="status"
+                                            value="Overdue"
+                                            checked={status === "Overdue"}
+                                            onChange={(e) =>
+                                                setStatus(e.target.value)
+                                            }
+                                        />
+                                        <label
+                                            htmlFor="overdue"
+                                            className={`form-label ms-2 me-4 text-${
+                                                mode === "light"
+                                                    ? "black"
+                                                    : "white"
+                                            }`}
+                                        >
+                                            Overdue
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            id="upcoming"
+                                            name="status"
+                                            value="Upcoming"
+                                            checked={status === "Upcoming"}
+                                            onChange={(e) =>
+                                                setStatus(e.target.value)
+                                            }
+                                        />
+                                        <label
+                                            htmlFor="upcoming"
+                                            className={`form-label ms-2 me-4 text-${
+                                                mode === "light"
+                                                    ? "black"
+                                                    : "white"
+                                            }`}
+                                        >
+                                            Upcoming
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="mb-4">
                                 <label
                                     htmlFor="describe"
@@ -331,6 +443,7 @@ const AddEvents = ({ addEventApi, error, mode }) => {
                                     onSelectColor={setSelectedColor}
                                 />
                             </div>
+
                             <button
                                 type="submit"
                                 className="btn btn-success btn-lg mt-4"

@@ -1,13 +1,11 @@
+//React imports
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./App.css";
 
+//LoggedIn
 import NavbarLoggedIn from "./Components/Common/NavbarLoggedIn";
-import NavbarLoggedOut from "./Components/Common/NavbarLoggedOut";
-import Footer from "./Components/Common/Footer";
-
 import HomeLoggedIn from "./Pages/HomeLoggedIn";
-import HomeLoggedOut from "./Pages/HomeLoggedOut";
 import Categories from "./Pages/Categories";
 import Profile from "./Pages/Profile";
 import AboutUs from "./Pages/AboutUs";
@@ -18,28 +16,45 @@ import UserPolicy from "./Pages/UserPolicy";
 import Terms from "./Pages/Terms";
 import PrivacyPolicy from "./Pages/PrivacyPolicy";
 import Dashboard from "./Pages/Dashboard";
-import Auth from "./Pages/Auth";
 import AccountSettings from "./Pages/AccountSettings";
 import MoreSettings from "./Pages/MoreSettings";
 import Reminders from "./Pages/Reminders";
 import Error404 from "./Pages/Error404";
-
 import UpdateProfile from "./Components/Profile/UpdateProfile";
-
 import MyCalendar from "./Components/Calendar/Calendar";
 import AddEvents from "./Components/Calendar/AddEvents";
 import UpdateEvent from "./Components/Calendar/UpdateEvent";
-
-import LightMode from "./Logic/LightMode";
-import DarkMode from "./Logic/DarkMode";
 import UploadEvents from "./Components/Calendar/UploadEvents";
 
+//LoggedOut
+import NavbarLoggedOut from "./Components/Common/NavbarLoggedOut";
+import HomeLoggedOut from "./Pages/HomeLoggedOut";
+
+//Universal
+import Footer from "./Components/Common/Footer";
+import LightMode from "./Logic/LightMode";
+import DarkMode from "./Logic/DarkMode";
+
+//ForgotPassword
+import ForgotPassword from "./Pages/ForgotPassword";
+
+//Auth
+import SignIn from "./Components/Login/SignIn";
+import SignUp from "./Components/Login/SignUp";
+
+
+
 function App() {
+    //Hooks
+    const location = useLocation();
+
+    //States
     const user = localStorage.getItem("token");
-
+    const auth = localStorage.getItem("auth");
     const [mode, setMode] = useState(localStorage.getItem("mode") || "light");
-
     const [eventsCount, setEventsCount] = useState(0);
+
+    //Handle functions
     const handleEventsCountChange = (count) => {
         setEventsCount(count);
     };
@@ -60,8 +75,6 @@ function App() {
             setMode("light");
         }
     };
-
-    const location = useLocation();
 
     const pathsWithoutNavbarFooter = ["/auth"];
     const shouldRenderNavbarFooter = !pathsWithoutNavbarFooter.includes(
@@ -84,36 +97,39 @@ function App() {
                     minHeight: "100vh",
                 }}
             >
-                {shouldRenderNavbarFooter && (
-                    <>
-                        {user ? (
-                            <NavbarLoggedIn
-                                mode={mode}
-                                toggleMode={toggleMode}
-                                eventsCount={eventsCount}
-                            />
-                        ) : (
-                            <NavbarLoggedOut
-                                mode={mode}
-                                toggleMode={toggleMode}
-                            />
-                        )}
-                    </>
-                )}
+                {location.pathname !== "/forgot-password" &&
+                    location.pathname !== "/dummy" &&
+                    location.pathname !== "/sign-in" &&
+                    location.pathname !== "/sign-up" && (
+                        <>
+                            {user || auth ? (
+                                <NavbarLoggedIn
+                                    mode={mode}
+                                    toggleMode={toggleMode}
+                                    eventsCount={eventsCount}
+                                />
+                            ) : (
+                                <NavbarLoggedOut
+                                    mode={mode}
+                                    toggleMode={toggleMode}
+                                />
+                            )}
+                        </>
+                    )}
 
                 <div style={{ flex: 1 }}>
                     <Routes>
                         <Route
-                            path="/auth"
+                            path="/sign-in"
                             element={
-                                user ? (
+                                user || auth ? (
                                     <Navigate replace to="/home" mode={mode} />
                                 ) : (
-                                    <Auth mode={mode} />
+                                    <SignIn />
                                 )
                             }
                         />
-                        {user ? (
+                        {user || auth ? (
                             <>
                                 <Route
                                     path="/"
@@ -201,7 +217,7 @@ function App() {
                                     element={<PrivacyPolicy mode={mode} />}
                                 />
                                 <Route
-                                    path="/events"
+                                    path="/events2"
                                     element={<MyCalendar mode={mode} />}
                                 />
                                 <Route
@@ -251,12 +267,24 @@ function App() {
                                     path="/contact"
                                     element={<Contact mode={mode} />}
                                 />
+                                <Route path="/sign-in" element={<SignIn />} />
+                                <Route path="/sign-up" element={<SignUp />} />
+
+                                <Route
+                                    path="/forgot-password"
+                                    element={<ForgotPassword mode={mode} />}
+                                />
+
                             </>
                         )}
                     </Routes>
                 </div>
 
-                {shouldRenderNavbarFooter && <Footer mode={mode} />}
+                {location.pathname !== "/forgot-password" &&
+                    location.pathname !== "/dummy" &&
+                    location.pathname !== "/sign-in" &&
+                    location.pathname !== "/sign-up" &&
+                    shouldRenderNavbarFooter && <Footer mode={mode} />}
             </div>
         </>
     );
