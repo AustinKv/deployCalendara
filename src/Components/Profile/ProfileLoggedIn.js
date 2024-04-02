@@ -28,7 +28,7 @@ const ProfileLoggedIn = (props) => {
         const fetchEvents = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:55555/api/reminders/1day/${userName}`
+                    `https://calendarabackend.onrender.com/api/reminders/1day/${userName}`
                 );
 
                 console.log("API Response:", response.data);
@@ -79,7 +79,7 @@ const ProfileLoggedIn = (props) => {
 
             if (Array.isArray(eventTitles1Day)) {
                 const response1 = await axios.post(
-                    "http://localhost:55555/api/sendmail",
+                    "https://calendarabackend.onrender.com/api/sendmail",
                     {
                         recipient,
                         eventTitles1Day,

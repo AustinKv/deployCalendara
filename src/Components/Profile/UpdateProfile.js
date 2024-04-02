@@ -36,11 +36,11 @@ const UpdateProfile = (props) => {
     const storeProfileImage = async () => {
         if (profileImageData) {
             const email = localStorage.getItem("email");
-            const deleteurl = `http://localhost:55555/api/profilepic/${email}`;
+            const deleteurl = `https://calendarabackend.onrender.com/api/profilepic/${email}`;
             await axios.delete(deleteurl);
 
             try {
-                const url = "http://localhost:55555/api/profilepic";
+                const url = "https://calendarabackend.onrender.com/api/profilepic";
 
                 const email = localStorage.getItem("email");
                 const imageData = localStorage.getItem("userProfileImage");
@@ -86,11 +86,11 @@ const UpdateProfile = (props) => {
     const storeBackgroundImage = async () => {
         if (backgroundImageData) {
             const email = localStorage.getItem("email");
-            const deleteurl = `http://localhost:55555/api/profilebgpic/${email}`;
+            const deleteurl = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
             await axios.delete(deleteurl);
 
             try {
-                const url = "http://localhost:55555/api/profilebgpic";
+                const url = "https://calendarabackend.onrender.com/api/profilebgpic";
 
                 const email = localStorage.getItem("email");
                 const bgimageData = localStorage.getItem("userBGImage");
@@ -118,7 +118,7 @@ const UpdateProfile = (props) => {
     const updateUserContact = async () => {
         try {
             const contact = localStorage.getItem("contact");
-            const url = `http://localhost:55555/api/updatedata/updateusercontact/${contact}`;
+            const url = `https://calendarabackend.onrender.com/api/updatedata/updateusercontact/${contact}`;
 
             const response = await axios.put(url, {
                 newUserContact: newUserContact,
