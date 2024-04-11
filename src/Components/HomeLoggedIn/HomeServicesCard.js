@@ -1,13 +1,11 @@
-import React from "react";
-
 const HomeServicesCard = (props) => {
     return (
         <>
             <div
-                className={`card my-4 border-secondary${
+                className={`card my-4 border-secondary ${
                     props.mode === "light" ? "-subtle" : ""
                 }`}
-                style={{ width: "25rem", overflow: "auto" }}
+                style={{ width: "30rem", overflow: "auto" }}
             >
                 <img
                     src={props.service.imgUrl}

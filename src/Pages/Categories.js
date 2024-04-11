@@ -10,7 +10,7 @@ const Categories = (props) => {
 
     localStorage.setItem("selectedColor", selectedColor);
 
-    const userName = localStorage.getItem("userName");
+    const email = localStorage.getItem("email");
 
     const [events, setEvents] = useState([]);
 
@@ -19,7 +19,7 @@ const Categories = (props) => {
             try {
                 const encodedColor = encodeURIComponent(selectedColor);
                 const response = await axios.get(
-                    `https://calendarabackend.onrender.com/api/categories/${userName}/${encodedColor}`
+                    `https://calendarabackend.onrender.com/api/categories/${email}/${encodedColor}`
                 );
                 setEvents(response.data);
             } catch (error) {
@@ -28,7 +28,7 @@ const Categories = (props) => {
         }
 
         fetchEvents();
-    }, [selectedColor, userName]);
+    }, [selectedColor, email]);
 
     const handleCheckboxClick = (colorValue) => {
         setSelectedColor((prevColor) =>

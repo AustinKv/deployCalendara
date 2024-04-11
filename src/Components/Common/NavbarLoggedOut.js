@@ -1,8 +1,22 @@
 import { Link } from "react-router-dom";
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NavbarLoggedOut = (props) => {
     const [showOffcanvas, setShowOffcanvas] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 991) {
+                setShowOffcanvas(false);
+            }
+        };
+
+        window.addEventListener("resize", handleResize);
+        handleResize();
+
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     return (
         <>
             <nav
@@ -40,8 +54,25 @@ const NavbarLoggedOut = (props) => {
                             aria-expanded="false"
                             aria-label="Toggle navigation"
                             onClick={() => setShowOffcanvas(!showOffcanvas)}
+                            style={{
+                                color:
+                                    props.mode === "light" ? "gray" : "white",
+                                border: "none",
+                            }}
                         >
-                            <span className="navbar-toggler-icon"></span>
+                            <span
+                                className="navbar-toggler-icon"
+                                style={{
+                                    filter:
+                                        props.mode === "light"
+                                            ? "invert(0)"
+                                            : "invert(1)",
+                                    color:
+                                        props.mode === "light"
+                                            ? "gray"
+                                            : "white",
+                                }}
+                            ></span>
                         </button>
 
                         <div

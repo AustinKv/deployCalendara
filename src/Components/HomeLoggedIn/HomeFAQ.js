@@ -1,17 +1,32 @@
-import React from "react";
+import { useInView } from "react-intersection-observer";
 import HomeAccordian from "./HomeAccordian";
 
 const HomeFAQ = (props) => {
+    const [ref, inView] = useInView({
+        threshold: 0,
+        triggerOnce: true,
+    });
+
     return (
-        <div className="container my-5">
+        <div
+            ref={ref}
+            className={`container home d-flex align-items-center animated ${
+                inView ? "animate slideInFromBottom" : ""
+            }`}
+            style={{
+                height: "50vh",
+                marginTop: "10rem",
+                marginBottom: "10rem",
+            }}
+        >
             <div className="row justify-content-center align-items-center">
-                <div className="col-lg-4 col-md-6 mb-4 mb-md-0 text-center">
+                <div className="col-lg-4 col-md-6 text-center">
                     <div
                         className={`text-${
                             props.mode === "light" ? "black" : "white"
                         }`}
                     >
-                        <p className="fw-bold" style={{ fontSize: "2.5rem" }}>
+                        <p className="" style={{ fontSize: "2.5rem" }}>
                             Built just for you!
                         </p>
                         <p>

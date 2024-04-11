@@ -1,17 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+
 
 const AccountSettings = ({ mode }) => {
-    const [isEnabled, setIsEnabled] = useState("Enable");
-    localStorage.setItem("isEnabled", false);
+    
+    const [isEnabled, setIsEnabled] = useState(true);
 
-    const toggleIsEnabled = () => {
-        if (isEnabled === "Enable") {
-            setIsEnabled("Disable");
-        } else {
-            setIsEnabled("Enable");
+    useEffect(() => {
+        const fetchReminderStatus = async () => {
+            try {
+                const email = localStorage.getItem("email");
+                const response = await axios.get(`https://calendarabackend.onrender.com/api/getData/${email}`);
+                const reminderStatus = response.data.reminder;
+                console.log(reminderStatus)
+                setIsEnabled(reminderStatus);
+                localStorage.setItem("isEnabled", reminderStatus.toString());
+            } catch (error) {
+                console.error("Error fetching reminder status:", error);
+                // Handle error
+            }
+        };
+
+        fetchReminderStatus();
+    }, []);
+
+    const toggleIsEnabled = async () => {
+        const newIsEnabled = !isEnabled;
+        setIsEnabled(newIsEnabled);
+        localStorage.setItem("isEnabled", newIsEnabled.toString());
+
+        try {
+            // Make PUT request to update reminder for all events using email
+            const email = localStorage.getItem("email");
+            await axios.put(`https://calendarabackend.onrender.com/api/events/${email}`, { reminder: newIsEnabled });
+            await axios.put(`https://calendarabackend.onrender.com/api/getData/${email}`, { reminder: newIsEnabled });
+        } catch (error) {
+            console.error("Error updating events:", error);
+            // Handle error
         }
     };
+    
     return (
         <>
             <div className="container my-5">
@@ -41,7 +71,7 @@ const AccountSettings = ({ mode }) => {
                                     mode === "light" ? "black" : "white"
                                 }`}
                             >
-                                {isEnabled} email notifications
+                                {isEnabled ? "Disable" : "Enable"} email notifications
                             </p>
 
                             <button
@@ -51,7 +81,7 @@ const AccountSettings = ({ mode }) => {
                                     mode === "light" ? "dark" : "light"
                                 }`}
                             >
-                                {isEnabled}
+                                {isEnabled ? "Disable" : "Enable"}
                             </button>
                         </div>
                     </h3>

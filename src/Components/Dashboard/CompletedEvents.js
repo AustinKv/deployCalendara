@@ -14,14 +14,14 @@ const CompletedEvents = (props) => {
     const [completedEvents, setCompletedEvents] = useState([]);
     const [modalShow, setModalShow] = useState(false);
 
-    const userName = localStorage.getItem("userName");
+    const email = localStorage.getItem("email");
 
     //Handling Functions
     useEffect(() => {
         const fetchCompletedEventsData = async () => {
             try {
                 const response = await axios.get(
-                    `https://calendarabackend.onrender.com/api/events/resolved/completed/${userName}`
+                    `https://calendarabackend.onrender.com/api/events/resolved/completed/${email}`
                 );
                 const events = response.data;
                 setCompletedEventsCount(events.length);
@@ -35,13 +35,13 @@ const CompletedEvents = (props) => {
         };
 
         fetchCompletedEventsData();
-    }, [userName]);
+    }, [email]);
 
     useEffect(() => {
         const fetchTotalEventsData = async () => {
             try {
                 const response = await axios.get(
-                    `https://calendarabackend.onrender.com/api/events/${userName}`
+                    `https://calendarabackend.onrender.com/api/events/${email}`
                 );
                 const events = response.data;
                 setTotalEventsCount(events.length);
@@ -51,7 +51,7 @@ const CompletedEvents = (props) => {
         };
 
         fetchTotalEventsData();
-    }, [userName]);
+    }, [email]);
 
     const handlePieClick = () => {
         setModalShow(true); // Open the modal when pie chart is clicked
@@ -74,7 +74,7 @@ const CompletedEvents = (props) => {
 
     const totalEventsColor = props.mode === "light" ? "#e6e6e6" : "#474b52";
 
-    const COLORS = ["#00e600", totalEventsColor];
+    const COLORS = ["#28a745", totalEventsColor];
 
     return (
         <>
@@ -210,7 +210,18 @@ const CompletedEvents = (props) => {
                                 }`}
                                 onClick={() => handleEventClick(event._id)}
                             >
-                                <h3>{event.title}</h3>
+                                <div className="d-flex align-items-center">
+                                    <div
+                                        className="me-2"
+                                        style={{
+                                            width: "1.25rem",
+                                            height: "1.25rem",
+                                            borderRadius: "50%",
+                                            backgroundColor: event.color,
+                                        }}
+                                    ></div>
+                                    <h3 className="my-0">{event.title}</h3>
+                                </div>
                                 <p>
                                     <strong>Description:</strong>{" "}
                                     {event.describe}
@@ -238,7 +249,9 @@ const CompletedEvents = (props) => {
                         backgroundColor:
                             props.mode === "light" ? "white" : "#36393e",
                     }}
-                    className="border-secondary"
+                    className={`border-${
+                        props.mode === "light" ? "" : "secondary"
+                    }`}
                 >
                     <p
                         className={`text-${

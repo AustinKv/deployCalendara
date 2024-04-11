@@ -1,5 +1,5 @@
 //React imports
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal, Dropdown } from "react-bootstrap";
 import axios from "axios";
@@ -21,19 +21,20 @@ const NavbarLoggedIn = (props) => {
     const [events1dayCount, setEvents1dayCount] = useState(0);
     const [totalCount, setTotalCount] = useState(0);
     const userName = localStorage.getItem("userName");
+    const email = localStorage.getItem("email");
 
     //Handling Functions
     const fetchEvents = useCallback(async () => {
         try {
             const response = await axios.get(
-                `https://calendarabackend.onrender.com/api/events/${userName}`
+                `https://calendarabackend.onrender.com/api/events/${email}`
             );
             setEvents(response.data);
             setFilteredEvents(response.data);
         } catch (error) {
             console.error("Error fetching events:", error);
         }
-    }, [userName]);
+    }, [email]);
 
     const filterEventsByTitle = useCallback(() => {
         const filtered = events.filter(
@@ -71,6 +72,7 @@ const NavbarLoggedIn = (props) => {
             await auth.signOut();
             localStorage.removeItem("auth");
             console.log("User signed out successfully");
+            navigate("/");
             // Perform any additional actions after sign out if needed
         } catch (error) {
             console.error("Error signing out:", error);
@@ -82,10 +84,15 @@ const NavbarLoggedIn = (props) => {
         localStorage.removeItem("token");
         handleSignOut();
         localStorage.removeItem("userName");
-        localStorage.removeItem("email");
         localStorage.removeItem("contact");
+        localStorage.removeItem("email");
         localStorage.removeItem("userProfileImage");
         localStorage.removeItem("userBGImage");
+        localStorage.removeItem("resolvedEventsCount");
+        localStorage.removeItem("categoryColor");
+        localStorage.removeItem("unresolvedEventsCount");
+        localStorage.removeItem("selectedColor");
+        localStorage.removeItem("isEnabled");
         navigate("/");
     };
 
@@ -103,7 +110,7 @@ const NavbarLoggedIn = (props) => {
         async function fetch7daysEventsCount() {
             try {
                 const response = await axios.get(
-                    `https://calendarabackend.onrender.com/api/reminders/7days/${userName}`
+                    `https://calendarabackend.onrender.com/api/reminders/7days/${email}`
                 );
                 setEvents7daysCount(response.data.length || 0);
             } catch (error) {
@@ -112,15 +119,15 @@ const NavbarLoggedIn = (props) => {
         }
 
         fetch7daysEventsCount();
-        const interval = setInterval(fetch7daysEventsCount, 10000); // Fetch every 10 secs
+        const interval = setInterval(fetch7daysEventsCount, 1000); // Fetch every 1 sec
         return () => clearInterval(interval); // Cleanup
-    }, [userName]);
+    }, [email]);
 
     useEffect(() => {
         async function fetch3daysEventsCount() {
             try {
                 const response = await axios.get(
-                    `https://calendarabackend.onrender.com/api/reminders/3days/${userName}`
+                    `https://calendarabackend.onrender.com/api/reminders/3days/${email}`
                 );
                 setEvents3daysCount(response.data.length || 0);
             } catch (error) {
@@ -129,15 +136,15 @@ const NavbarLoggedIn = (props) => {
         }
 
         fetch3daysEventsCount();
-        const interval = setInterval(fetch3daysEventsCount, 10000); // Fetch every 10 secs
+        const interval = setInterval(fetch3daysEventsCount, 1000); // Fetch every 1 sec
         return () => clearInterval(interval); // Cleanup
-    }, [userName]);
+    }, [email]);
 
     useEffect(() => {
         async function fetch1dayEventsCount() {
             try {
                 const response = await axios.get(
-                    `https://calendarabackend.onrender.com/api/reminders/1day/${userName}`
+                    `https://calendarabackend.onrender.com/api/reminders/1day/${email}`
                 );
                 setEvents1dayCount(response.data.length || 0);
             } catch (error) {
@@ -146,19 +153,32 @@ const NavbarLoggedIn = (props) => {
         }
 
         fetch1dayEventsCount();
-        const interval = setInterval(fetch1dayEventsCount, 10000); // Fetch every 10 secs
+        const interval = setInterval(fetch1dayEventsCount, 1000); // Fetch every 1 sec
         return () => clearInterval(interval); // Cleanup
-    }, [userName]);
+    }, [email]);
 
     useEffect(() => {
         const totalCount =
             events7daysCount + events3daysCount + events1dayCount;
         setTotalCount(totalCount);
-        const interval = setInterval(setTotalCount(totalCount), 10000); // Fetch every 10 secs
+        const interval = setInterval(setTotalCount(totalCount), 1000); // Fetch every 1 sec
         return () => clearInterval(interval); // Cleanup
     }, [events7daysCount, events3daysCount, events1dayCount]);
 
     const [showOffcanvas, setShowOffcanvas] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 991) {
+                setShowOffcanvas(false);
+            }
+        };
+
+        window.addEventListener("resize", handleResize);
+        handleResize();
+
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     return (
         <>
@@ -174,12 +194,16 @@ const NavbarLoggedIn = (props) => {
             >
                 <div className="container-fluid">
                     <div className="container d-flex justify-content-between">
-                        <div className="navbar-brand w-25">
+                        <div className="navbar-brand d-flex align-items-center p-0 m-0 justify-content-center w-25">
                             <Link className="p-0" to="/home">
                                 <img
                                     src={`/Images/Logo/calendara_${props.mode}.png`}
                                     className="img-fluid"
-                                    style={{ maxWidth: "100%" }}
+                                    style={{
+                                        maxWidth: "100%",
+                                        minWidth: "5rem",
+                                        height: "auto",
+                                    }}
                                     alt=""
                                     onError={(e) =>
                                         console.error("Image failed to load", e)
@@ -220,10 +244,14 @@ const NavbarLoggedIn = (props) => {
                         <div
                             className="collapse navbar-collapse"
                             id="navbarSupportedContent"
+                            style={{ marginRight: "auto" }}
                         >
                             <ul
                                 className="navbar-nav me-auto mb-2 mb-lg-0"
-                                style={{ marginLeft: "5rem" }}
+                                style={{
+                                    marginLeft: "auto",
+                                    marginRight: "auto",
+                                }}
                             >
                                 <li className="nav-item mx-2">
                                     <Link
@@ -347,7 +375,10 @@ const NavbarLoggedIn = (props) => {
                                     </Dropdown>
                                 </li>
 
-                                <li style={{ marginLeft: "5rem" }}>
+                                <li
+                                    className="navbar-search"
+                                    style={{ marginLeft: "5rem" }}
+                                >
                                     <Link
                                         className={`nav-link hover-navlink text-${
                                             props.mode === "light"
@@ -443,7 +474,7 @@ const NavbarLoggedIn = (props) => {
                                                 filteredEvents.map((event) => (
                                                     <div
                                                         key={event._id}
-                                                        className={`mt-2    mb-5 text-${
+                                                        className={`mt-2 mb-5 text-${
                                                             props.mode ===
                                                             "light"
                                                                 ? "black"
@@ -455,7 +486,22 @@ const NavbarLoggedIn = (props) => {
                                                             )
                                                         }
                                                     >
-                                                        <h3>{event.title}</h3>
+                                                        <div className="d-flex align-items-center">
+                                                            <div
+                                                                className="me-2"
+                                                                style={{
+                                                                    width: "1.25rem",
+                                                                    height: "1.25rem",
+                                                                    borderRadius:
+                                                                        "50%",
+                                                                    backgroundColor:
+                                                                        event.color,
+                                                                }}
+                                                            ></div>
+                                                            <h3 className="my-0">
+                                                                {event.title}
+                                                            </h3>
+                                                        </div>
                                                         <p>
                                                             <strong>
                                                                 Description:
@@ -731,7 +777,7 @@ const NavbarLoggedIn = (props) => {
                     ></button>
                 </div>
                 <div
-                    className="offcanvas-body pt-5"
+                    className="offcanvas-body pt-3"
                     style={{
                         backgroundColor:
                             props.mode === "light" ? "#fff" : "#36393e",
@@ -915,6 +961,32 @@ const NavbarLoggedIn = (props) => {
                                 </div>
                             </label>
                         </li>
+
+                        <li className="d-flex justify-content-center align-items-center">
+                            <Link
+                                to="/reminders"
+                                className="me-4 position-relative"
+                                type="button"
+                            >
+                                <i
+                                    className={`bi bi-bell text-${
+                                        props.mode === "light"
+                                            ? "black"
+                                            : "white"
+                                    }`}
+                                    style={{ fontSize: "1.5rem" }}
+                                ></i>
+                                <span
+                                    className={`badge position-absolute text-bg-${
+                                        props.mode === "light"
+                                            ? "danger"
+                                            : "warning"
+                                    }`}
+                                >
+                                    {totalCount}
+                                </span>
+                            </Link>
+                        </li>
                         <li style={{ margin: "auto" }}>
                             <Link
                                 className={`nav-link hover-navlink text-${
@@ -1013,7 +1085,21 @@ const NavbarLoggedIn = (props) => {
                                                     handleEventClick(event._id)
                                                 }
                                             >
-                                                <h3>{event.title}</h3>
+                                                <div className="d-flex align-items-center">
+                                                    <div
+                                                        className="me-2"
+                                                        style={{
+                                                            width: "1.25rem",
+                                                            height: "1.25rem",
+                                                            borderRadius: "50%",
+                                                            backgroundColor:
+                                                                event.color,
+                                                        }}
+                                                    ></div>
+                                                    <h3 className="my-0">
+                                                        {event.title}
+                                                    </h3>
+                                                </div>
                                                 <p>
                                                     <strong>
                                                         Description:
@@ -1077,7 +1163,7 @@ const NavbarLoggedIn = (props) => {
                                 </Modal.Footer>
                             </Modal>
                         </li>
-                        <li className="nav-item">
+                        <li className="nav-item d-flex justify-content-center">
                             <Link
                                 className={`nav-link hover-underline text-${
                                     props.mode === "light" ? "black" : "white"
@@ -1088,7 +1174,7 @@ const NavbarLoggedIn = (props) => {
                                 Home
                             </Link>
                         </li>
-                        <li className="nav-item">
+                        <li className="nav-item d-flex justify-content-center">
                             <Link
                                 className={`nav-link hover-underline text-${
                                     props.mode === "light" ? "black" : "white"
@@ -1099,7 +1185,7 @@ const NavbarLoggedIn = (props) => {
                                 Dashboard
                             </Link>
                         </li>
-                        <li className="nav-item">
+                        <li className="nav-item d-flex justify-content-center">
                             <Link
                                 className={`nav-link hover-underline text-${
                                     props.mode === "light" ? "black" : "white"
