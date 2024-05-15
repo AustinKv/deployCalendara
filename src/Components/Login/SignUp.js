@@ -1,9 +1,10 @@
 import React, { useState } from "react"; //imports
 import { Button } from "react-bootstrap";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import waveBG from "./wave-auth-bg.svg";
+import defaultProfileImg from "./defaultProfile.jpg";
 
 import { auth } from "./firebase";
 import {
@@ -19,9 +20,7 @@ import {
 } from "firebase/auth";
 
 const SignUp = (props) => {
-
     //Hooks
-    const navigate = useNavigate();
 
     const [authe, setAuthe] = useState(
         false || window.localStorage.getItem("auth") === "true"
@@ -62,7 +61,7 @@ const SignUp = (props) => {
 
         e.preventDefault();
 
-        const url = "https://calendarabackend.onrender.com/api/users";
+        const url = "http://localhost:55555/api/users";
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValidEmail = emailRegex.test(data.email);
@@ -114,15 +113,18 @@ const SignUp = (props) => {
 
             const email = result.user.email;
             const name = result.user.displayName;
-            const contact = result.user.phoneNumber;
-            const profilePic = result.user.photoURL;
+            const contact = result.user.phoneNumber || "";
+            const profilePic = result.user.photoURL || defaultProfileImg;
+
+            console.log(contact);
+            console.log(profilePic);
 
             localStorage.setItem("email", email);
             localStorage.setItem("userName", name);
             localStorage.setItem("contact", contact);
             localStorage.setItem("userProfileImage", profilePic);
 
-            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
+            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
             console.log(bgimagenameURL);
             const response2 = await axios.get(bgimagenameURL);
 
@@ -131,8 +133,10 @@ const SignUp = (props) => {
                 localStorage.setItem("userBGImage", response2.data.bgimageData);
                 console.log(bgimageData);
             }
-            console.log("User signed in successfully");
-            navigate("/")
+
+            console.log("User signed in successfully with Google");
+            window.alert(`Welcome ${name || email}!`);
+            window.location.reload();
         } catch (error) {
             console.error("Error:", error);
         }
@@ -152,15 +156,16 @@ const SignUp = (props) => {
 
             const email = user.email;
             const name = user.displayName;
-            const contact = user.phoneNumber;
-            const profilePic = user.photoURL;
+
+            const contact = user.phoneNumber || "";
+            const profilePic = user.photoURL || defaultProfileImg;
 
             localStorage.setItem("email", email);
             localStorage.setItem("userName", name);
             localStorage.setItem("contact", contact);
             localStorage.setItem("userProfileImage", profilePic);
 
-            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
+            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
             console.log(bgimagenameURL);
             const response2 = await axios.get(bgimagenameURL);
 
@@ -187,14 +192,14 @@ const SignUp = (props) => {
             const email = result.user.email;
             const name = result.user.displayName;
             const contact = result.user.phoneNumber;
-            const profilePic = result.user.photoURL;
+            const profilePic = result.user.photoURL || defaultProfileImg;
 
             localStorage.setItem("email", email);
             localStorage.setItem("userName", name);
             localStorage.setItem("contact", contact);
             localStorage.setItem("userProfileImage", profilePic);
 
-            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
+            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
             console.log(bgimagenameURL);
             const response2 = await axios.get(bgimagenameURL);
 
@@ -228,7 +233,7 @@ const SignUp = (props) => {
                     const email = user.email;
                     const name = user.displayName;
                     const contact = user.phoneNumber || "";
-                    const profilePic = user.photoURL || "";
+                    const profilePic = user.photoURL || defaultProfileImg;
 
                     localStorage.setItem("email", email);
                     localStorage.setItem("userName", name);
@@ -296,7 +301,7 @@ const SignUp = (props) => {
                 localStorage.setItem("contact", contact);
                 localStorage.setItem("userProfileImage", profilePic);
 
-                const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
+                const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
                 console.log(bgimagenameURL);
 
                 // Error handling for API call
@@ -341,16 +346,18 @@ const SignUp = (props) => {
                     // Retrieve and store user information
                     const email = user.email;
                     const name = user.displayName;
-                    const profilePic = user.photoURL || "";
+                    const contact = user.phoneNumber || "";
+                    const profilePic = user.photoURL || defaultProfileImg;
 
                     localStorage.setItem("email", email);
                     localStorage.setItem("userName", name);
+                    localStorage.setItem("contact", contact);
                     localStorage.setItem("userProfileImage", profilePic);
 
                     window.location.reload();
-                    console.log("User signed in successfully wht GitHub");
-                } catch (error) {
-                    if (error.code === "auth/provider-already-linked") {
+                    console.log("User signed in successfully with GitHub");
+                } catch (linkError) {
+                    if (linkError.code === "auth/provider-already-linked") {
                         // GitHub account is already linked to another account
                         console.error(
                             "GitHub account is already linked to another account."
@@ -379,7 +386,7 @@ const SignUp = (props) => {
 
                             window.location.reload();
                             console.log(
-                                "User signed in successfully wht GitHub"
+                                "User signed in successfully with GitHub"
                             );
                         } catch (unlinkError) {
                             console.error(
@@ -388,7 +395,10 @@ const SignUp = (props) => {
                             );
                         }
                     } else {
-                        console.error("Error linking GitHub account:", error);
+                        console.error(
+                            "Error linking GitHub account:",
+                            linkError
+                        );
                     }
                 }
             } else {
@@ -404,10 +414,18 @@ const SignUp = (props) => {
                 localStorage.setItem("userProfileImage", profilePic);
 
                 window.location.reload();
-                console.log("User signed in successfully wht GitHub");
+                console.log("User signed in successfully with GitHub");
             }
         } catch (error) {
-            console.error("Error signing in with GitHub:", error);
+            if (
+                error.code === "auth/account-exists-with-different-credential"
+            ) {
+                // Handle the "auth/account-exists-with-different-credential" error
+                // You can prompt the user to link their accounts or sign in with the existing provider
+                console.error("Account exists with different credential");
+            } else {
+                console.error("Error signing in with GitHub:", error);
+            }
         }
     };
 
