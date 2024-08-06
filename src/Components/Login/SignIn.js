@@ -68,12 +68,12 @@ const SignIn = (props) => {
 
         const fetchData = async () => {
             try {
-                const nameURL = `http://localhost:55555/api/getData/${data.email}`;
+                const nameURL = `https://calendarabackend.onrender.com/api/getData/${data.email}`;
                 const response = await axios.get(nameURL);
                 setUserName(response.data.name);
                 setContact(response.data.contact);
 
-                const imagenameURL = `http://localhost:55555/api/profilepic/${data.email}`;
+                const imagenameURL = `https://calendarabackend.onrender.com/api/profilepic/${data.email}`;
                 const response1 = await axios.get(imagenameURL);
                 if (response1.data.imageData) {
                     setImageData(response1.data.imageData);
@@ -83,7 +83,7 @@ const SignIn = (props) => {
                     );
                 }
 
-                const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${data.email}`;
+                const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${data.email}`;
                 const response2 = await axios.get(bgimagenameURL);
                 if (response2.data.bgimageData) {
                     setbgImageData(response2.data.bgimageData);
@@ -107,11 +107,11 @@ const SignIn = (props) => {
 
         e.preventDefault();
 
-        const url = "http://localhost:55555/api/auth";
+        const url = "https://calendarabackend.onrender.com/api/auth";
 
         try {
             const { data: res } = await axios.post(url, data);
-            const nameURL = `http://localhost:55555/api/getData/${data.email}`;
+            const nameURL = `https://calendarabackend.onrender.com/api/getData/${data.email}`;
             const response = await axios.get(nameURL);
 
             setUserName(response.data.name);
@@ -126,7 +126,7 @@ const SignIn = (props) => {
             localStorage.setItem("contact", response.data.contact);
             localStorage.setItem("token", res.data);
 
-            const imagenameURL = `http://localhost:55555/api/profilepic/${data.email}`;
+            const imagenameURL = `https://calendarabackend.onrender.com/api/profilepic/${data.email}`;
             const response1 = await axios.get(imagenameURL);
 
             if (response1.data.imageData) {
@@ -138,7 +138,7 @@ const SignIn = (props) => {
                 console.log(imageData);
             }
 
-            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${data.email}`;
+            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${data.email}`;
             const response2 = await axios.get(bgimagenameURL);
 
             if (response2.data.bgimageData) {
@@ -178,7 +178,7 @@ const SignIn = (props) => {
             localStorage.setItem("contact", contact);
             localStorage.setItem("userProfileImage", profilePic);
 
-            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
+            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
             console.log(bgimagenameURL);
             const response2 = await axios.get(bgimagenameURL);
 
@@ -219,7 +219,7 @@ const SignIn = (props) => {
             localStorage.setItem("contact", contact);
             localStorage.setItem("userProfileImage", profilePic);
 
-            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
+            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
             console.log(bgimagenameURL);
             const response2 = await axios.get(bgimagenameURL);
 
@@ -253,7 +253,7 @@ const SignIn = (props) => {
             localStorage.setItem("contact", contact);
             localStorage.setItem("userProfileImage", profilePic);
 
-            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
+            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
             console.log(bgimagenameURL);
             const response2 = await axios.get(bgimagenameURL);
 
@@ -355,7 +355,7 @@ const SignIn = (props) => {
                 localStorage.setItem("contact", contact);
                 localStorage.setItem("userProfileImage", profilePic);
 
-                const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
+                const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
                 console.log(bgimagenameURL);
 
                 // Error handling for API call

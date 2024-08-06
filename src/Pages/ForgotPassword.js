@@ -14,7 +14,7 @@ const ForgotPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const url = "http://localhost:55555/api/forgotpassword";
+        const url = "https://calendarabackend.onrender.com/api/forgotpassword";
         const data = { email };
 
         try {

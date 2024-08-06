@@ -61,7 +61,7 @@ const SignUp = (props) => {
 
         e.preventDefault();
 
-        const url = "http://localhost:55555/api/users";
+        const url = "https://calendarabackend.onrender.com/api/users";
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValidEmail = emailRegex.test(data.email);
@@ -124,7 +124,7 @@ const SignUp = (props) => {
             localStorage.setItem("contact", contact);
             localStorage.setItem("userProfileImage", profilePic);
 
-            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
+            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
             console.log(bgimagenameURL);
             const response2 = await axios.get(bgimagenameURL);
 
@@ -165,7 +165,7 @@ const SignUp = (props) => {
             localStorage.setItem("contact", contact);
             localStorage.setItem("userProfileImage", profilePic);
 
-            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
+            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
             console.log(bgimagenameURL);
             const response2 = await axios.get(bgimagenameURL);
 
@@ -199,7 +199,7 @@ const SignUp = (props) => {
             localStorage.setItem("contact", contact);
             localStorage.setItem("userProfileImage", profilePic);
 
-            const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
+            const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
             console.log(bgimagenameURL);
             const response2 = await axios.get(bgimagenameURL);
 
@@ -301,7 +301,7 @@ const SignUp = (props) => {
                 localStorage.setItem("contact", contact);
                 localStorage.setItem("userProfileImage", profilePic);
 
-                const bgimagenameURL = `http://localhost:55555/api/profilebgpic/${email}`;
+                const bgimagenameURL = `https://calendarabackend.onrender.com/api/profilebgpic/${email}`;
                 console.log(bgimagenameURL);
 
                 // Error handling for API call
