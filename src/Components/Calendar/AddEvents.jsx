@@ -21,7 +21,6 @@ const schema = yup
 const AddEvents = ({ addEventApi, error, mode }) => {
     //Hooks
     const navigate = useNavigate();
-
     //States
     const [rerender, setRerender] = useState(false);
     const [dbError, setError] = useState(false);
